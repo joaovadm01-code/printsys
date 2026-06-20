@@ -1,0 +1,41 @@
+{
+  "generatedAt": "2026-06-19T18:32:56.532Z",
+  "baseUrl": "http://localhost:3000",
+  "steps": [
+    {
+      "name": "login_admin",
+      "status": "ok"
+    },
+    {
+      "name": "print_settings_saved",
+      "companyId": "company-main",
+      "primaryColor": "#2563eb"
+    },
+    {
+      "name": "customer_contact_saved",
+      "customerId": "c-35929",
+      "previousCount": 10
+    },
+    {
+      "name": "quote_order_notifications_triggered",
+      "quoteId": "q-78804",
+      "orderId": "OS-1079"
+    },
+    {
+      "name": "notification_queue_validated",
+      "generated": 6,
+      "markedSent": "ntf-82854"
+    },
+    {
+      "name": "customer_tracking_safe",
+      "orders": 1,
+      "quotes": 1
+    },
+    {
+      "name": "browser_validation",
+      "screenshot": "work/print-communication-validation.png",
+      "printSettingsScreenshot": "work/print-settings-validation.png",
+      "consoleErrors": []
+    }
+  ]
+}

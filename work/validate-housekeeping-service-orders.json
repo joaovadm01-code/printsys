@@ -1,0 +1,61 @@
+{
+  "generatedAt": "2026-06-19T14:24:47.106Z",
+  "baseUrl": "http://localhost:3000",
+  "steps": [
+    {
+      "name": "login_admin",
+      "status": "ok"
+    },
+    {
+      "name": "base_data",
+      "customerId": "c1",
+      "productId": "p1",
+      "sector": "Comercial",
+      "employee": "Ana Paula"
+    },
+    {
+      "name": "create_source_order",
+      "quoteId": "q-75617",
+      "orderId": "OS-1074"
+    },
+    {
+      "name": "create_rework",
+      "orderId": "OS-1075",
+      "originalOrderId": "OS-1074",
+      "total": 0,
+      "financialStatus": "nao faturavel"
+    },
+    {
+      "name": "create_courtesy",
+      "orderId": "OS-1076",
+      "total": 0,
+      "financialStatus": "nao faturavel"
+    },
+    {
+      "name": "block_non_billable_payment",
+      "status": "ok"
+    },
+    {
+      "name": "cancel_order",
+      "orderId": "OS-1074",
+      "lifecycleStatus": "cancelled",
+      "productionStatus": "Cancelada"
+    },
+    {
+      "name": "production_movements",
+      "total": 103,
+      "summary": {
+        "total": 103,
+        "today": 80,
+        "reworks": 6,
+        "cancellations": 4
+      }
+    },
+    {
+      "name": "finance_loaded",
+      "billed": 6819.01,
+      "receivable": 6519.01,
+      "paid": 17
+    }
+  ]
+}

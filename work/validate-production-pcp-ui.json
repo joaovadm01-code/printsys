@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-06-19T14:21:15.713Z",
+  "base": "http://localhost:3000",
+  "orderId": "OS-1071",
+  "validation": {
+    "expectedOrderId": "OS-1071",
+    "hasPanel": true,
+    "hasOrder": true,
+    "hasTechnical": true,
+    "hasFiles": true,
+    "hasNotes": true,
+    "hasHistory": true,
+    "hasRealActions": true,
+    "buttons": [
+      "Adicionar observação",
+      "Registrar duvida",
+      "Ver arquivos",
+      "Baixar arquivo",
+      "Abrir O.S.",
+      "Imprimir O.S.",
+      "Baixar",
+      "Baixar",
+      "Baixar"
+    ],
+    "textLength": 2540
+  },
+  "consoleErrors": [],
+  "failedRequests": [],
+  "failed": []
+}

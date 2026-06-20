@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PrintSys ERP/PDV</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <div class="brand"><strong>print</strong><span>sys</span></div>
+      <div class="user"><div class="avatar">JV</div><b>Joao Victor</b></div>
+      <nav>
+        <div class="nav-group">Geral</div>
+        <button class="active" data-view="dashboard"><span class="nav-ico">▦</span><span class="nav-label">Dashboard</span></button>
+        <button data-view="intelligence" data-required-permission="bi"><span class="nav-ico">★</span><span class="nav-label">Central de Gestão</span></button>
+        <div class="nav-group">Administração</div>
+        <button data-view="customers" data-required-permission="administration"><span class="nav-ico">◉</span><span class="nav-label">Clientes</span></button>
+        <div class="nav-group">Comercial</div>
+        <button data-view="quote" data-required-permission="quote"><span class="nav-ico">▣</span><span class="nav-label">Orçamentos</span></button>
+        <button data-view="commercial" data-required-permission="commercial"><span class="nav-ico">◎</span><span class="nav-label">Comercial</span></button>
+        <button data-view="pricing-simulator" data-required-permission="quote"><span class="nav-ico">%</span><span class="nav-label">Simular preço</span></button>
+        <button data-view="portal" data-required-permission="customerPortal"><span class="nav-ico">@</span><span class="nav-label">Portal do Cliente</span></button>
+        <button data-view="orders" data-required-permission="orders"><span class="nav-ico">▤</span><span class="nav-label">Ordem de Serviço</span></button>
+        <div class="nav-group">Financeiro</div>
+        <button data-view="finance" data-required-permission="financialSummary"><span class="nav-ico">◫</span><span class="nav-label">Financeiro</span></button>
+        <button data-view="bi" data-required-permission="bi"><span class="nav-ico">▣</span><span class="nav-label">Relatórios gerenciais</span></button>
+        <button data-view="cash" data-required-permission="cash"><span class="nav-ico">▥</span><span class="nav-label">Caixa / PDV</span></button>
+        <button data-view="control"><span class="nav-ico">◎</span><span class="nav-label">Controle</span></button>
+        <div class="nav-group">Suprimentos</div>
+        <button data-view="products" data-required-permission="supplies"><span class="nav-ico">▨</span><span class="nav-label">Estoque / Materiais</span></button>
+        <div class="nav-group">Produção</div>
+        <button data-view="pcp" data-required-permission="production"><span class="nav-ico">▧</span><span class="nav-label">Produção / PCP</span></button>
+        <div class="nav-group">Sistema</div>
+        <button data-view="products" data-required-permission="settings"><span class="nav-ico">▨</span><span class="nav-label">Produtos</span></button>
+        <button data-view="admin" data-required-permission="settings"><span class="nav-ico">?</span><span class="nav-label">Questionários</span></button>
+        <button data-view="integrations" data-required-permission="integrations"><span class="nav-ico">↔</span><span class="nav-label">Conexões externas</span></button>
+        <button data-view="settings" data-required-permission="settings"><span class="nav-ico">⚙</span><span class="nav-label">Sistema / Configurações</span></button>
+      </nav>
+    </aside>
+
+    <main>
+      <header>
+        <button id="menu-toggle" title="Recolher menu">☰</button>
+        <div><b>Piau Net</b> :: ERP para gráfica</div>
+        <input id="search" placeholder="Buscar cliente, O.S., produto">
+        <div class="top-status" aria-label="Status de O.S.">
+          <span id="top-sales" title="O.S. concluídas/ok">0</span>
+          <span id="top-quotes" title="O.S. em atenção">0</span>
+          <span id="top-alerts" title="O.S. atrasadas/com problema">0</span>
+        </div>
+      </header>
+
+      <section id="dashboard" class="view active">
+        <div class="module-tabs"><button class="active">Visão geral</button><button>Atalhos</button><button>Alertas</button><button>Tarefas</button></div>
+        <div class="welcome"><div class="avatar large">JV</div><div><span>Bem-vind@,</span><h1>Joao Victor</h1></div></div>
+        <div class="cards" id="dashboard-cards"></div>
+        <div class="panel"><h2>Painel rapido</h2><div class="cards compact" id="quick-panel"></div><div id="important-alerts" class="alert-list"></div></div>
+        <div class="grid two">
+          <div class="panel"><h2>Atalhos</h2><div class="shortcuts"><button data-view="quote">Novo orcamento</button><button data-view="cash">PDV</button><button data-view="orders">O.S.</button><button data-view="pcp">PCP</button><button data-view="finance">Faturamento</button></div></div>
+          <div class="panel"><h2>Tarefas</h2><div id="tasks"></div></div>
+        </div>
+      </section>
+
+      <section id="intelligence" class="view">
+        <div class="title"><div><h1>IA / Assistente</h1><p>Respostas operacionais, alertas e sugestões baseadas nos dados reais do PrintSys.</p></div></div>
+        <div class="module-tabs"><button class="active">Resumo</button><button>Perguntas rápidas</button><button>Sugestão de orçamento</button><button>Produção</button><button>Financeiro</button><button>Indicadores</button><button>Busca</button><button>Preferências</button></div>
+        <div class="panel"><div class="form-row"><div><b id="intel-last-update">Última atualização: carregando...</b><p id="intel-greeting"></p></div><button id="intel-refresh" class="primary">Atualizar dados gerenciais</button></div></div>
+        <div class="cards" id="intel-summary"></div>
+        <div class="grid two">
+          <div class="panel"><h2>Alertas críticos e sugestões</h2><div id="intel-alerts" class="alert-list"></div><div id="intel-suggestions" class="mini-grid"></div></div>
+          <div class="panel"><h2>Previsões e pontos de atenção</h2><div id="intel-predictions" class="mini-grid"></div><div id="intel-bottlenecks" class="mini-grid"></div></div>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel">
+            <h2>Perguntas rápidas do gestor</h2>
+            <div class="shortcuts">
+              <button data-question="O que está pendente hoje?">Pendências de hoje</button>
+              <button data-question="Como criar um orcamento?">Como criar orcamento</button>
+              <button data-question="Como criar uma O.S.?">Como criar O.S.</button>
+              <button data-question="Como receber um pagamento?">Como receber</button>
+              <button data-question="Como mover a producao de setor?">Como mover setor</button>
+              <button data-question="Como registrar uma visita tecnica?">Como registrar visita</button>
+              <button data-question="Qual produto deu mais lucro?">Produto mais lucrativo</button>
+              <button data-question="Qual cliente está devendo?">Cliente devendo</button>
+              <button data-question="Qual vendedor mais vendeu?">Melhor vendedor</button>
+              <button data-question="Qual O.S. deu prejuízo?">O.S. com prejuízo</button>
+              <button data-question="Qual setor está atrasando?">Setor atrasando</button>
+              <button data-question="Qual produto está abaixo da margem?">Produto abaixo da margem</button>
+              <button data-question="Qual cliente tem maior risco?">Cliente de risco</button>
+            </div>
+            <form id="intel-question-form"><label>Pergunta<input id="intel-question" value="Qual produto deu mais lucro?"></label><button class="primary">Perguntar</button></form>
+            <div id="intel-answer" class="price-box">Aguardando pergunta.</div>
+          </div>
+          <div class="panel">
+            <h2>Sugestão de orçamento</h2>
+            <form id="intel-quote-form"><label>Descreva o trabalho<input id="intel-quote-text" value="Fachada ACM 10x1,20 com LED e instalacao"></label><button class="primary">Sugerir preenchimento</button></form>
+            <div id="intel-quote-result" class="price-box"></div>
+          </div>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel"><h2>Análise da produção</h2><div id="intel-production" class="mini-grid"></div></div>
+          <div class="panel"><h2>Análise financeira</h2><div id="intel-financial" class="mini-grid"></div></div>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel"><h2>Indicadores consolidados</h2><div id="intel-analytics" class="mini-grid"></div></div>
+          <div class="panel">
+            <h2>Busca global</h2>
+            <form id="global-search-form"><label>Buscar<input id="global-search" placeholder="cliente, O.S., orçamento, produto, arquivo, pagamento"></label><button class="primary">Buscar</button></form>
+            <div id="global-search-results" class="timeline"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>Preferências</h2>
+          <form id="preferences-form" class="grid two">
+            <label>Tema<select id="pref-theme"><option value="light">Claro</option><option value="dark">Escuro</option></select></label>
+            <label>Favoritos<input id="pref-favorites" value="dashboard,intelligence,bi,cash"></label>
+            <label>Atalhos<input id="pref-shortcuts" value="quote,cash,orders,pcp"></label>
+            <label>Quadros do painel<input id="pref-widgets" value="summary,alerts,predictions,risks"></label>
+            <button class="primary">Salvar preferências</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="commercial" class="view">
+        <div class="title"><div><h1>Comercial</h1><p>Clientes em negociação, retornos, metas e conversão para orçamento e O.S.</p></div></div>
+        <div class="module-tabs"><button class="active">Funil</button><button>Clientes em negociação</button><button>Retornos</button><button>Metas</button><button>Relatórios</button><button>Perdas</button></div>
+        <div class="grid two">
+          <div class="panel">
+            <h2>Novo lead</h2>
+            <form id="lead-form">
+              <div class="form-row"><label>Nome<input id="lead-name" value="Cliente novo"></label><label>Empresa<input id="lead-company" value="Empresa teste"></label></div>
+              <div class="form-row"><label>Telefone<input id="lead-phone" value="(85) 99999-0000"></label><label>WhatsApp<input id="lead-whatsapp" value="(85) 99999-0000"></label></div>
+              <div class="form-row"><label>Origem<select id="lead-origin"><option>Instagram</option><option>Facebook</option><option>Google</option><option>Site</option><option>Indicacao</option><option>WhatsApp</option><option>Cliente antigo</option><option>Trafego pago</option><option>Outro</option></select></label><label>Vendedor<input id="lead-seller" value="Joao Victor"></label></div>
+              <label>Interesse<input id="lead-interest" value="Faixa / Lona"></label>
+              <div class="form-row"><label>Valor estimado<input id="lead-estimated" type="number" value="900"></label><label>Proximo contato<input id="lead-next" type="datetime-local"></label></div>
+              <label>Observacao<input id="lead-note" value="Primeiro atendimento comercial"></label>
+              <button class="primary">Cadastrar lead</button>
+            </form>
+          </div>
+          <div class="panel"><h2>Alertas comerciais</h2><div id="commercial-alerts" class="alert-list"></div></div>
+        </div>
+        <div class="panel"><h2>Funil de vendas</h2><div id="sales-funnel" class="kanban"></div></div>
+        <div class="grid two stack-gap">
+          <div class="panel">
+            <h2>Follow-up</h2>
+            <form id="follow-form">
+              <label>Lead<select id="follow-lead"></select></label>
+              <div class="form-row"><label>Data<input id="follow-date" type="date"></label><label>Hora<input id="follow-time" type="time"></label></div>
+              <div class="form-row"><label>Canal<select id="follow-channel"><option>WhatsApp</option><option>ligacao</option><option>e-mail</option><option>presencial</option></select></label><label>Vendedor<input id="follow-seller" value="Joao Victor"></label></div>
+              <label>Observacao<input id="follow-note" value="Retornar com proposta"></label>
+              <button class="primary">Agendar retorno</button>
+            </form>
+          </div>
+          <div class="panel">
+            <h2>Conversao</h2>
+            <form id="lead-convert-form">
+              <label>Lead<select id="convert-lead"></select></label>
+              <div class="form-row"><label>Produto<select id="convert-product"></select></label><label>Composicao<select id="convert-composition"></select></label></div>
+              <label>Trabalho<input id="convert-job" value="Orcamento vindo do CRM"></label>
+              <div class="form-row"><button type="button" id="convert-customer">Virar cliente</button><button class="primary">Virar orcamento</button></div>
+            </form>
+          </div>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel"><h2>Metas de vendedores</h2><div id="seller-goals" class="mini-grid"></div></div>
+          <div class="panel"><h2>Relatorios comerciais</h2><div id="commercial-report" class="mini-grid"></div></div>
+        </div>
+        <div class="panel"><h2>Leads</h2><table><thead><tr><th>Cliente</th><th>Origem</th><th>Vendedor</th><th>Interesse</th><th>Valor</th><th>Proximo contato</th><th>Status</th></tr></thead><tbody id="lead-table"></tbody></table></div>
+      </section>
+
+      <section id="portal" class="view">
+        <div class="title"><div><h1>Portal do Cliente</h1><p>Previa segura por token. O cliente ve apenas orcamentos, O.S., arquivos liberados, pagamentos e timeline simples.</p></div></div>
+        <div class="module-tabs"><button class="active">Portal</button><button>Orcamentos</button><button>Artes</button><button>Arquivos</button><button>Pagamentos</button><button>Timeline</button></div>
+        <div class="panel">
+          <form id="portal-token-form" class="form-row">
+            <label>Token/link seguro<input id="portal-token" value="portal-c1-demo"></label>
+            <button class="primary">Carregar portal</button>
+          </form>
+        </div>
+        <div class="grid two">
+          <div class="panel"><h2>Orcamentos do cliente</h2><div id="portal-quotes" class="stack-gap"></div></div>
+          <div class="panel"><h2>O.S. e pagamentos</h2><div id="portal-orders" class="stack-gap"></div></div>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel">
+            <h2>Enviar arquivo / comprovante</h2>
+            <form id="portal-upload-form">
+              <div class="form-row"><label>Orcamento<select id="portal-upload-quote"></select></label><label>O.S.<select id="portal-upload-order"></select></label></div>
+              <label>Arquivo<input id="portal-upload-file" value="arquivo-cliente.pdf"></label>
+              <label>Observacao<input id="portal-upload-note" value="Arquivo enviado pelo portal"></label>
+              <button class="primary">Anexar no portal</button>
+            </form>
+          </div>
+          <div class="panel"><h2>Timeline do cliente</h2><div id="portal-timeline" class="timeline"></div></div>
+        </div>
+      </section>
+
+      <section id="quote" class="view">
+        <div class="title"><div><h1>Novo orçamento</h1><p>Selecione o serviço, informe as medidas e o sistema calcula custo, margem e preço sugerido.</p></div></div>
+        <div class="module-tabs"><button class="active">Novo orçamento</button><button>Consulta</button><button>Acompanhamento</button><button>Itens</button><button>Produtos</button><button>Venda direta</button><button>Agrupados</button><button>Anexos</button></div>
+        <div class="grid two">
+          <div class="panel">
+            <form id="quote-form" class="quote-form-pro">
+              <div class="quote-os-card">
+                <span>Ordem de serviço</span>
+                <strong id="quote-os-number">Nova</strong>
+                <small>Status: orçamento em edição</small>
+                <small>Tipo: <b id="quote-os-type-preview">Orçamento</b></small>
+              </div>
+              <label>Cliente<select id="quote-customer"></select></label>
+              <div id="quote-customer-card" class="client-summary"></div>
+              <div class="form-row"><label>Contato<input id="quote-contact" placeholder="Contato do cliente"></label><label>Vendedor<input id="quote-seller" value="Joao Victor"></label></div>
+              <div class="form-row"><label>Atendente<input id="quote-attendant" value="Atendimento"></label><label>Campanha<input id="quote-campaign" placeholder="Campanha/ação"></label></div>
+              <label>Endereço de entrega<input id="quote-delivery-address" placeholder="Rua, numero, bairro"></label>
+              <div class="form-row"><label>Logística<select id="quote-logistics"><option>Retirada no balcão</option><option>Entrega local</option><option>Instalação externa</option></select></label><label>Prazo de entrega<input id="quote-deadline" type="date"></label></div>
+              <div class="form-row"><label>Validade<input id="quote-validity" type="date"></label><label>Forma de pagamento<select id="quote-payment-method"><option>Pix</option><option>Dinheiro</option><option>Cartão crédito</option><option>Cartão débito</option><option>Fiado/prazo</option></select></label></div>
+              <div class="form-row"><label>Condição de pagamento<input id="quote-payment-terms" placeholder="50% sinal + restante na entrega"></label><label>Faturamento<select id="quote-billing"><option>Normal</option><option>Fiado/prazo</option><option>Parcial</option><option>Sinal</option></select></label></div>
+              <div class="form-row"><label>Sinal / entrada<input id="quote-down-payment" type="number" value="0"></label><label>Faturar para<input id="quote-bill-to" placeholder="Mesmo cliente"></label></div>
+              <div class="form-row"><label>Pedido de compra<input id="quote-purchase-order" placeholder="Número do pedido"></label><label>Anexar pedido<input id="quote-purchase-file" placeholder="pedido-compra.pdf"></label></div>
+              <div class="form-row"><label>Comissão (%)<input id="quote-commission" type="number" value="3"></label><label>Custos diversos<input id="quote-extra-costs" type="number" value="0"></label></div>
+              <div class="tabs-inline"><button type="button">Custos diversos</button><button type="button">Hora homem</button><button type="button">Incluir comissão</button></div>
+              <label>Hora homem prevista<input id="quote-human-hours" type="number" step="0.1" value="1"></label>
+              <label>Produto<select id="quote-product"></select></label>
+              <label>Composição técnica<select id="quote-composition"></select></label>
+              <div id="quote-composition-info" class="price-box">Selecione a composição técnica.</div>
+              <label>Trabalho<input id="quote-job" value="Faixa promocional"></label>
+              <div class="form-row"><label>Largura<input data-answer="width" type="number" step="0.01" placeholder="0,00"></label><label>Altura<input data-answer="height" type="number" step="0.01" placeholder="0,00"></label></div>
+              <div class="form-row"><label>Espessura<input data-answer="thickness" type="number" step="0.01" placeholder="Opcional"></label><label>Quantidade<input data-answer="quantity" type="number" step="1" value="1"></label></div>
+              <h3>Perguntas do produto</h3>
+              <div id="question-fields" class="question-grid"></div>
+              <h3>Observações</h3>
+              <div class="form-row"><label>Para o cliente<textarea id="quote-client-note" placeholder="Aparece no PDF ou portal"></textarea></label><label>Para a produção<textarea id="quote-production-note" placeholder="Aparece no PCP/produção"></textarea></label></div>
+              <label>Para o financeiro<textarea id="quote-finance-note" placeholder="Aparece no caixa/financeiro"></textarea></label>
+              <h3>Arquivos</h3>
+              <div class="form-row"><label>Imagens de visualização<input id="quote-preview-files" placeholder="foto-local.jpg, mockup.png"></label><label>Arquivos de produção<input id="quote-production-files" placeholder="arte-final.pdf, aprovado.cdr"></label></div>
+              <div class="form-row"><label>Despesas adicionais<input id="quote-extra-costs-final" type="number" value="0"></label><label>Preço final manual<input id="quote-manual-price" type="number" step="0.01" value="0"></label></div>
+              <label>Motivo da alteração de preço<input id="quote-price-reason" placeholder="Obrigatório quando alterar o preço sugerido"></label>
+              <label>Desconto para simular (%)<input id="quote-discount" type="number" value="0"></label>
+              <div class="quote-footer">
+                <button type="button">Opções</button>
+                <button type="button">Salvar rascunho</button>
+                <button type="button" id="simulate-price">Simular preço</button>
+                <button class="primary">Salvar orçamento</button>
+                <button type="button">Enviar para aprovação</button>
+                <button type="button">Fechar</button>
+              </div>
+            </form>
+          </div>
+          <div class="panel quote-side-panel"><h2>Preço calculado</h2><div id="quote-price-cards" class="mini-grid"></div><div id="quote-price-alerts" class="alert-list stack-gap"></div><div id="price-result" class="price-box stack-gap">Responda o questionário.</div><div id="quote-total-summary" class="total-lines stack-gap"></div></div>
+        </div>
+        <div class="panel stack-gap">
+          <h2>Itens do orçamento</h2>
+          <div class="tabs-inline"><button>Produtos</button><button>Venda direta</button><button>Agrupados</button><button>Imagens de visualização</button><button>Anexos</button></div>
+          <table><thead><tr><th>Item</th><th>Modelo</th><th>Descrição</th><th>Equipamentos</th><th>Acabamentos</th><th>Tamanho</th><th>Qtd.</th><th>Un.</th><th>Unitário</th><th>Subtotal</th><th>Ações</th></tr></thead><tbody id="quote-items-preview"></tbody></table>
+        </div>
+        <div class="panel"><h2>Orcamentos</h2><table><thead><tr><th>Numero</th><th>Cliente</th><th>Trabalho</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody id="quote-table"></tbody></table></div>
+      </section>
+
+      <section id="pricing-simulator" class="view">
+        <div class="title"><div><h1>Simulador de preço</h1><p>Valide custos, margem e preço antes de transformar a simulação em orçamento.</p></div></div>
+        <div class="module-tabs"><button class="active">Simulação</button><button>Materiais</button><button>Custos</button><button>Alertas</button><button>Histórico</button></div>
+        <div class="grid two">
+          <div class="panel">
+            <h2>Teste real</h2>
+            <form id="pricing-simulator-form">
+              <label>Composicao selecionada<select id="sim-composition"></select></label>
+              <div class="form-row"><label>Largura<input id="sim-width" type="number" step="0.01" value="3"></label><label>Altura<input id="sim-height" type="number" step="0.01" value="1.5"></label></div>
+              <div class="form-row"><label>Quantidade<input id="sim-quantity" type="number" step="1" value="1"></label><label>Deslocamento (km)<input id="sim-distance" type="number" step="0.1" value="20"></label></div>
+              <div class="form-row"><label>Despesas adicionais<input id="sim-extra" type="number" step="0.01" value="0"></label><label>Preco manual para comparar<input id="sim-manual" type="number" step="0.01" value="0"></label></div>
+              <button class="primary">Simular preço</button>
+            </form>
+            <div class="sim-presets" id="sim-presets"></div>
+          </div>
+          <div class="panel">
+            <h2>Resultado financeiro</h2>
+            <div id="sim-result-cards" class="mini-grid"></div>
+            <div id="sim-alerts" class="alert-list stack-gap"></div>
+            <button id="sim-create-quote" class="primary" disabled>Gerar orçamento a partir da simulação</button>
+          </div>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel">
+            <h2>Materiais usados</h2>
+            <table><thead><tr><th>Material</th><th>Quantidade</th><th>Custo unitario</th><th>Custo total</th></tr></thead><tbody id="sim-material-table"></tbody></table>
+          </div>
+          <div class="panel">
+            <h2>Producao e instalacao</h2>
+            <table><thead><tr><th>Setor</th><th>Hora homem</th><th>Hora maquina</th><th>Custo</th></tr></thead><tbody id="sim-production-table"></tbody></table>
+          </div>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel"><h2>Comparação entre preço manual e calculado</h2><div id="sim-difference" class="price-box">Execute uma simulação.</div></div>
+          <div class="panel"><h2>Histórico do custo usado</h2><div id="sim-history" class="timeline"></div></div>
+        </div>
+      </section>
+
+      <section id="orders" class="view">
+        <div class="title"><h1>Ordens de servico</h1></div>
+        <div class="module-tabs"><button class="active">Consulta</button><button>Aprovação</button><button>Histórico</button><button>Estoque</button><button>Pós-cálculo</button><button>Ficha de produção</button></div>
+        <div id="orders-summary" class="cards compact"></div>
+        <div class="panel">
+          <div class="table-filters"><input id="order-filter" placeholder="Filtrar O.S., cliente, produto ou status"></div>
+          <table><thead><tr><th>O.S.</th><th>Cliente</th><th>Produto</th><th>Vendedor</th><th>Valor</th><th>Custo previsto</th><th>Margem prev.</th><th>Financeiro</th><th>Produção</th><th>Prazo</th><th>Ações</th></tr></thead><tbody id="orders-table"></tbody></table>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel">
+            <h2>Aprovacao do cliente</h2>
+            <form id="approval-form">
+              <label>O.S.<select id="approval-order"></select></label>
+              <label>Status<select id="approval-status"><option>Aguardando aprovação</option><option>Aprovado pelo cliente</option><option>Reprovado</option><option>Ajuste solicitado</option></select></label>
+              <label>Comprovante/arte aprovada<input id="approval-file" placeholder="arte-aprovada.pdf"></label>
+              <button class="primary">Atualizar aprovação</button>
+            </form>
+          </div>
+          <div class="panel">
+            <h2>Historico da O.S.</h2>
+            <label>Selecionar O.S.<select id="history-order"></select></label>
+            <div id="order-history" class="timeline"></div>
+          </div>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel">
+            <h2>Baixa de estoque por O.S.</h2>
+            <form id="stock-form">
+              <label>O.S.<select id="stock-order"></select></label>
+              <label>Material<select id="stock-material"></select></label>
+              <label>Quantidade usada<input id="stock-qty" type="number" step="0.01" value="1"></label>
+              <button class="primary">Baixar material</button>
+            </form>
+          </div>
+          <div class="panel">
+            <h2>Pos-calculo</h2>
+            <label>O.S.<select id="postcalc-order"></select></label>
+            <div id="postcalc-result" class="price-box"></div>
+          </div>
+        </div>
+        <div class="panel stack-gap">
+          <h2>Etiqueta / ficha de producao</h2>
+          <label>O.S.<select id="label-order"></select></label>
+          <button id="load-label">Gerar ficha</button>
+          <div id="production-label" class="label-preview"></div>
+        </div>
+      </section>
+
+      <section id="pcp" class="view">
+        <div class="title"><h1>PCP e producao</h1></div>
+        <div class="module-tabs"><button class="active">Painel de produção</button><button>O.S. por setor</button><button>O.S. atrasadas</button><button>O.S. com problema</button><button>Equipe de instalação</button><button>Produção por etapas</button><button>Histórico da O.S.</button></div>
+        <div class="cards compact" id="pcp-dashboard-cards"></div>
+        <div class="grid two stack-gap">
+          <div class="panel"><h2>Alertas inteligentes</h2><div id="production-alerts" class="alert-list"></div></div>
+          <div class="panel"><h2>Capacidade produtiva</h2><div id="capacity-list" class="mini-grid"></div></div>
+        </div>
+        <div id="pcp-board" class="kanban"></div>
+        <div class="panel stack-gap">
+          <h2>Produção estilo operacional</h2>
+          <table><thead><tr><th>O.S.</th><th>Cliente</th><th>Produto</th><th>Setor atual</th><th>Próximo setor</th><th>Responsável</th><th>Status</th><th>Prazo</th><th>Prioridade</th><th>Arquivos</th><th>Problemas</th></tr></thead><tbody id="production-detail-table"></tbody></table>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel">
+            <h2>Movimentar O.S. entre setores</h2>
+            <form id="move-sector-form">
+              <label>O.S.<select id="move-order"></select></label>
+              <label>Novo setor<select id="move-next-sector"></select></label>
+              <label>Usuario<input id="move-user" value="PCP"></label>
+              <label>Observacao<input id="move-observation" placeholder="Motivo ou instrucao"></label>
+              <button class="primary">Mover setor</button>
+            </form>
+          </div>
+          <div class="panel">
+            <h2>Apontamento de custo real</h2>
+            <form id="real-cost-form">
+              <label>O.S.<select id="real-order"></select></label>
+              <label>Setor<input id="real-sector" placeholder="Impressao, Corte, Instalacao"></label>
+              <div class="form-row"><label>Funcionario<input id="real-employee"></label><label>Funcao<input id="real-role"></label></div>
+              <div class="form-row"><label>Tempo mao de obra (min)<input id="real-labor-min" type="number" value="0"></label><label>Valor hora homem<input id="real-labor-hour" type="number" value="0"></label></div>
+              <div class="form-row"><label>Maquina usada<input id="real-machine"></label><label>Tempo maquina (min)<input id="real-machine-min" type="number" value="0"></label></div>
+              <div class="form-row"><label>Valor hora maquina<input id="real-machine-hour" type="number" value="0"></label><label>Material<select id="real-material"></select></label></div>
+              <label>Quantidade material<input id="real-material-qty" type="number" step="0.01" value="0"></label>
+              <button class="primary">Registrar custo real</button>
+            </form>
+          </div>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel">
+            <h2>Registrar problema / retrabalho</h2>
+            <form id="problem-form">
+              <label>O.S.<select id="problem-order"></select></label>
+              <label>Tipo<select id="problem-type"><option>arquivo incorreto</option><option>material insuficiente</option><option>erro de impressao</option><option>erro de corte</option><option>erro de acabamento</option><option>retrabalho</option><option>maquina parada</option><option>falta de informacao</option><option>outro</option></select></label>
+              <label>Descricao<input id="problem-description"></label>
+              <div class="form-row"><label>Responsavel<input id="problem-responsible"></label><label>Setor<input id="problem-sector"></label></div>
+              <div class="form-row"><label>Custo estimado<input id="problem-cost" type="number" value="0"></label><label>Impacto prazo (h)<input id="problem-deadline" type="number" value="0"></label></div>
+              <label><input id="problem-rework" type="checkbox"> Retrabalho</label>
+              <label>Fotos<input id="problem-photos" placeholder="foto1.jpg, foto2.jpg"></label>
+              <button class="primary">Registrar problema</button>
+            </form>
+          </div>
+          <div class="panel">
+            <h2>Checklist de instalacao</h2>
+            <form id="install-checklist-form">
+              <label>O.S.<select id="check-order"></select></label>
+              <label>Responsavel<input id="check-responsible"></label>
+              <label>Veiculo<input id="check-vehicle"></label>
+              <label>Itens conferidos<input id="check-items" value="material conferido,ferramentas,EPIs,escada,parafusos,fita dupla face,silicone,extensoes,refletores/LED se houver"></label>
+              <div class="form-row"><label>Fotos antes<input id="check-before"></label><label>Fotos depois<input id="check-after"></label></div>
+              <label>Assinatura cliente<input id="check-signature"></label>
+              <label><input id="check-finish" type="checkbox"> Finalizar instalacao</label>
+              <button class="primary">Salvar checklist</button>
+            </form>
+          </div>
+        </div>
+        <div class="panel stack-gap"><h2>Relatorio previsto x real por O.S.</h2><label>O.S.<select id="pcp-report-order"></select></label><div id="pcp-real-report" class="price-box"></div></div>
+        <div class="grid two stack-gap">
+          <div class="panel">
+            <h2>Equipe de instalacao por O.S.</h2>
+            <form id="install-team-form">
+              <label>O.S.<select id="team-order"></select></label>
+              <label>Nome da equipe<input id="team-name" value="Equipe externa 01"></label>
+              <label>Responsavel<input id="team-responsible" value="Joao Victor"></label>
+              <label>Membros<input id="team-members" placeholder="Ana, Pedro, Marcos"></label>
+              <label>Carro/veiculo<input id="team-vehicle" placeholder="Strada branca"></label>
+              <div class="form-row"><label>Data de saida<input id="team-date" type="date"></label><label>Horario de saida<input id="team-out" type="time"></label><label>Horario de retorno<input id="team-back" type="time"></label></div>
+              <label>Status da instalacao<select id="team-status"><option>agendada</option><option>em rota</option><option>executando</option><option>concluida</option><option>com problema</option></select></label>
+              <label>Observacoes<input id="team-notes"></label>
+              <label>Fotos da instalacao<input id="team-photos" placeholder="URLs ou nomes dos arquivos"></label>
+              <label>Assinatura/confirmacao<input id="team-confirmation" placeholder="Cliente confirmou por assinatura ou WhatsApp"></label>
+              <button class="primary">Vincular equipe</button>
+            </form>
+          </div>
+          <div class="panel">
+            <h2>Producao por etapas</h2>
+            <form id="production-event-form">
+              <label>O.S.<select id="event-order"></select></label>
+              <label>Ação<select id="event-action"><option value="receber">Receber pelo setor</option><option value="iniciar">Iniciar produção</option><option value="pausar">Pausar produção</option><option value="finalizar">Finalizar etapa</option></select></label>
+              <label>Setor atual<input id="event-sector" placeholder="Impressao, Corte, Instalacao"></label>
+              <div class="form-row"><label>Recebido por<input id="event-received"></label><label>Ciencia do responsavel<input id="event-ack"></label></div>
+              <div class="form-row"><label>Iniciado por<input id="event-started"></label><label>Pausado por<input id="event-paused"></label></div>
+              <label>Motivo da pausa<input id="event-pause-reason"></label>
+              <div class="form-row"><label>Finalizado por<input id="event-finished"></label><label>Proximo setor<input id="event-next"></label></div>
+              <label>Tempo gasto (min)<input id="event-time-spent" type="number" value="0"></label>
+              <label>Problema identificado<input id="event-problem"></label>
+              <label>Fotos/arquivos da etapa<input id="event-files" placeholder="URLs ou nomes dos arquivos"></label>
+              <button class="primary">Registrar etapa</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section id="bi" class="view">
+        <div class="title"><div><h1>Relatórios gerenciais</h1><p>Indicadores de resultado, rentabilidade, rankings, alertas, previsões e pontos de atenção.</p></div></div>
+        <div class="module-tabs"><button class="active">Dashboard</button><button>Rentabilidade</button><button>Rankings</button><button>Alertas</button><button>Previsoes</button><button>Gargalos</button><button>Exportacao</button></div>
+        <div class="cards" id="bi-dashboard"></div>
+        <div class="grid two">
+          <div class="panel"><h2>Rentabilidade</h2><div id="bi-profitability" class="mini-grid"></div></div>
+          <div class="panel"><h2>Rankings</h2><div id="bi-rankings" class="mini-grid"></div></div>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel"><h2>Alertas inteligentes</h2><div id="bi-alerts" class="alert-list"></div></div>
+          <div class="panel"><h2>Previsoes</h2><div id="bi-predictions" class="mini-grid"></div></div>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel"><h2>Gargalos</h2><div id="bi-bottlenecks" class="mini-grid"></div></div>
+          <div class="panel"><h2>Relatório executivo</h2><div class="shortcuts"><button id="bi-export-csv">Exportar CSV</button><button id="bi-export-pdf">Exportar PDF</button><button id="bi-run-automations" class="primary">Executar rotinas</button></div><div id="bi-export-preview" class="price-box"></div></div>
+        </div>
+      </section>
+
+      <section id="finance" class="view">
+        <div class="title"><h1>Financeiro</h1></div>
+        <div class="module-tabs"><button class="active">Resumo</button><button>Faturamento</button><button>Contas a receber</button><button>Fiado</button><button>Despesas Operacionais</button><button>Aprovações</button><button>DRE</button><button>Relatórios</button></div>
+        <div class="cards" id="finance-cards"></div>
+        <div class="panel stack-gap"><h2>Dashboard financeiro gerencial</h2><div id="finance-dashboard" class="mini-grid"></div></div>
+        <div class="grid two stack-gap">
+          <div class="panel"><h2>Contas a receber</h2><table><thead><tr><th>Origem</th><th>Cliente</th><th>Vencimento</th><th>Valor</th><th>Saldo</th></tr></thead><tbody id="receivables-table"></tbody></table></div>
+          <div class="panel"><h2>Contas a pagar</h2><table><thead><tr><th>Categoria</th><th>Fornecedor</th><th>Vencimento</th><th>Valor</th><th>Saldo</th></tr></thead><tbody id="payables-table"></tbody></table></div>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel"><h2>Fluxo de caixa</h2><div id="cash-flow-cards" class="mini-grid"></div></div>
+          <div class="panel"><h2>Inadimplencia</h2><div id="delinquency-list" class="mini-grid"></div></div>
+        </div>
+        <div class="panel"><h2>Clientes fiado/prazo</h2><table><thead><tr><th>Cliente</th><th>Limite</th><th>Saldo</th></tr></thead><tbody id="fiado-table"></tbody></table></div>
+        <div class="panel stack-gap">
+          <h2>Despesas Operacionais</h2>
+          <div class="module-tabs sub-tabs"><button class="active">Nova despesa</button><button>Aprovações</button><button>Despesas por setor</button><button>Despesas por O.S.</button><button>Prestação de contas</button><button>Relatórios</button></div>
+          <form id="operational-expense-form">
+            <div class="form-row"><label>Data<input id="opex-date" type="date"></label><label>Hora<input id="opex-time" type="time"></label></div>
+            <div class="form-row"><label>Responsável<input id="opex-responsible" value="Joao Victor" required></label><label>Setor<input id="opex-sector" value="Administrativo"></label></div>
+            <div class="form-row"><label>Categoria<select id="opex-category"></select></label><label>Subcategoria<input id="opex-subcategory" placeholder="Ex.: viagem local"></label></div>
+            <div class="form-row"><label>O.S. vinculada<select id="opex-order"><option value="">Sem O.S.</option></select></label><label>Valor<input id="opex-value" type="number" step="0.01" required></label></div>
+            <div class="form-row"><label>Forma de pagamento<select id="opex-payment"><option>Dinheiro</option><option>Pix</option><option>Cartao credito</option><option>Cartao debito</option><option>Outros</option></select></label><label>Comprovante<input id="opex-receipt" placeholder="foto, PDF, cupom ou NF"></label></div>
+            <div class="form-row"><label>Tipo de upload<select id="opex-upload-type"><option>Foto</option><option>PDF</option><option>Cupom fiscal</option><option>Nota fiscal</option></select></label><label>Veículo<select id="opex-vehicle"><option value="">Sem veículo</option></select></label></div>
+            <label>Observação<input id="opex-observation" placeholder="Motivo obrigatório da retirada"></label>
+            <button class="primary">Registrar despesa / retirada</button>
+          </form>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel">
+            <h2>Adiantamento para equipe</h2>
+            <form id="advance-form">
+              <label>Equipe<input id="advance-team" value="Equipe instalação"></label>
+              <label>Responsável<input id="advance-responsible" value="Pedro Lima"></label>
+              <label>Finalidade<input id="advance-purpose" value="combustível e alimentação"></label>
+              <label>Valor recebido<input id="advance-value" type="number" value="300"></label>
+              <button class="primary">Gerar prestação pendente</button>
+            </form>
+          </div>
+          <div class="panel">
+            <h2>Prestação de contas</h2>
+            <form id="accountability-form">
+              <label>Adiantamento<select id="accountability-advance"></select></label>
+              <label>Valor gasto<input id="accountability-spent" type="number" value="0"></label>
+              <label>Saldo devolvido<input id="accountability-returned" type="number" value="0"></label>
+              <label>Notas/comprovantes<input id="accountability-receipts" placeholder="cupom1.pdf, foto2.jpg"></label>
+              <button class="primary">Registrar prestação</button>
+            </form>
+          </div>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel"><h2>Despesas registradas</h2><table><thead><tr><th>Data</th><th>Responsável</th><th>Categoria</th><th>Setor</th><th>O.S.</th><th>Valor</th><th>Status</th></tr></thead><tbody id="operational-expense-table"></tbody></table></div>
+          <div class="panel"><h2>DRE</h2><div id="dre-cards" class="mini-grid"></div></div>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel"><h2>Relatórios de despesas</h2><div id="expense-report-cards" class="mini-grid"></div></div>
+          <div class="panel">
+            <h2>Veículos</h2>
+            <form id="vehicle-form">
+              <div class="form-row"><label>Veículo<input id="vehicle-name"></label><label>Placa<input id="vehicle-plate"></label></div>
+              <div class="form-row"><label>Motorista<input id="vehicle-driver"></label><label>Combustível<input id="vehicle-fuel" type="number" value="0"></label></div>
+              <div class="form-row"><label>Km inicial<input id="vehicle-initial" type="number" value="0"></label><label>Km final<input id="vehicle-final" type="number" value="0"></label></div>
+              <label>Manutenção<input id="vehicle-maintenance" type="number" value="0"></label>
+              <button class="primary">Cadastrar veículo</button>
+            </form>
+            <div id="vehicle-report" class="mini-grid"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="cash" class="view">
+        <div class="title"><h1>Caixa / PDV com conferencia cega</h1></div>
+        <div class="module-tabs"><button>Abrir caixa</button><button>Gerar venda por O.S.</button><button class="active">Venda rápida sem O.S.</button><button>Receber sinal</button><button>Receber fiado</button><button>Fechamento cego</button><button>Resumo diário</button></div>
+        <div class="panel">
+          <h2>O.S. para faturar</h2>
+          <table><thead><tr><th>O.S.</th><th>Cliente</th><th>Valor</th><th>Status</th><th>Ação</th></tr></thead><tbody id="cash-orders-table"></tbody></table>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel">
+            <h2>Abertura de caixa</h2>
+            <form id="cash-open-form">
+              <label>Operador<input id="cash-open-operator" value="Joao Victor"></label>
+              <div class="form-row"><label>Data<input id="cash-open-date" type="date"></label><label>Hora<input id="cash-open-hour" type="time"></label></div>
+              <label>Valor inicial<input id="cash-open-amount" type="number" value="0"></label>
+              <button class="primary">Abrir caixa</button>
+            </form>
+          </div>
+          <div class="panel"><h2>Relatorio do caixa</h2><div id="cash-report-cards" class="mini-grid"></div></div>
+        </div>
+        <div class="grid two">
+          <div class="panel">
+            <h2>Abrir caixa / recebimento avulso</h2>
+            <form id="cash-sale-form">
+              <label>Valor<input id="cash-sale-amount" type="number" value="120"></label>
+              <label>Pagamento<select id="cash-sale-method"><option>Pix</option><option>Dinheiro</option><option>Cartao credito</option><option>Cartao debito</option><option>Transferencia</option><option>Boleto</option><option>Fiado</option></select></label>
+              <button class="primary">Registrar</button>
+            </form>
+          </div>
+          <div class="panel">
+            <h2>Registrar despesa do caixa</h2>
+            <form id="cash-expense-form">
+              <div class="form-row"><label>Data<input id="cash-expense-date" type="date"></label><label>Hora<input id="cash-expense-time" type="time"></label></div>
+              <label>Responsável<input id="cash-expense-responsible" value="Joao Victor"></label>
+              <label>Categoria<select id="cash-expense-category"></select></label>
+              <label>Valor<input id="cash-expense-value" type="number" step="0.01"></label>
+              <label>Motivo/observação<input id="cash-expense-note"></label>
+              <button class="primary">Registrar retirada</button>
+            </form>
+          </div>
+          <div class="panel">
+            <h2>Sangria / Suprimento</h2>
+            <form id="cash-adjust-form">
+              <label>Tipo<select id="cash-adjust-type"><option value="sangria">Sangria</option><option value="suprimento">Suprimento</option></select></label>
+              <label>Responsavel<input id="cash-adjust-responsible" value="Joao Victor"></label>
+              <label>Valor<input id="cash-adjust-amount" type="number" value="0"></label>
+              <label>Motivo / origem<input id="cash-adjust-note"></label>
+              <button class="primary">Registrar ajuste</button>
+            </form>
+          </div>
+          <div class="panel">
+            <h2>Venda rapida sem O.S.</h2>
+            <form id="quick-sale-form">
+              <label>Produto/servico<select id="quick-product"></select></label>
+              <label>Descricao<input id="quick-description" value="Impressao rapida"></label>
+              <div class="form-row"><label>Quantidade<input id="quick-quantity" type="number" value="1"></label><label>Valor unitario<input id="quick-unit" type="number" value="2"></label></div>
+              <label>Forma de pagamento<select id="quick-payment"><option>Pix</option><option>Dinheiro</option><option>Cartao credito</option><option>Cartao debito</option><option>Transferencia</option><option>Boleto</option><option>Fiado</option></select></label>
+              <label>Destino da venda<select id="quick-billing-decision"><option value="bill_now">Faturar agora e lançar no caixa</option><option value="pending_cash">Gerar pendência para o caixa</option><option value="already_billed">Registrar como já faturada</option></select></label>
+              <label>Cliente opcional<select id="quick-customer"><option value="">Sem cliente</option></select></label>
+              <label>Observacao<input id="quick-notes" placeholder="Servico simples de balcao"></label>
+              <button class="primary">Finalizar venda direta</button>
+            </form>
+          </div>
+          <div class="panel">
+            <h2>Fechamento cego</h2>
+            <form id="blind-close-form">
+              <label>Dinheiro contado<input id="blind-money" type="number" value="0"></label>
+              <label>Pix recebido<input id="blind-pix" type="number" value="0"></label>
+              <label>Credito<input id="blind-credit" type="number" value="0"></label>
+              <label>Debito<input id="blind-debit" type="number" value="0"></label>
+              <button class="primary">Fechar sem ver esperado</button>
+            </form>
+            <div id="blind-result" class="price-box"></div>
+          </div>
+        </div>
+        <div class="panel"><h2>Vendas rápidas</h2><table><thead><tr><th>Descrição</th><th>Código</th><th>Qtd.</th><th>Total</th><th>Pagamento</th><th>Faturamento</th><th>Caixa</th></tr></thead><tbody id="quick-sales-table"></tbody></table></div>
+      </section>
+
+      <section id="customers" class="view">
+        <div class="title"><h1>Clientes</h1></div>
+        <div class="module-tabs"><button class="active">Cadastro</button><button>Consulta</button><button>Fiado/prazo</button><button>Histórico</button></div>
+        <div class="grid two">
+          <div class="panel"><form id="customer-form"><label>Nome<input id="customer-name"></label><label>Telefone<input id="customer-phone"></label><label>Email<input id="customer-email"></label><button class="primary">Cadastrar cliente</button></form></div>
+          <div class="panel"><table><thead><tr><th>Cliente</th><th>Telefone</th><th>Email</th><th>Limite</th></tr></thead><tbody id="customer-table"></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="products" class="view">
+        <div class="title"><div><h1>Produtos e servicos</h1><p>Codigo interno, categoria, valor base e tipo de calculo.</p></div></div>
+        <div class="module-tabs"><button class="active">Produtos</button><button>Ficha técnica</button><button>Materiais</button><button>Acabamentos</button><button>Precificação</button></div>
+        <div class="grid two">
+          <div class="panel">
+            <h2>Novo produto</h2>
+            <form id="product-form">
+              <label>Codigo interno<input id="product-code" value="PRS-001"></label>
+              <label>Nome<input id="product-name" value="Servico personalizado"></label>
+              <label>Descricao<input id="product-description"></label>
+              <label>Categoria<input id="product-category" value="Personalizado"></label>
+              <div class="form-row"><label>Valor base<input id="product-base" type="number" value="80"></label><label>Tipo de calculo<select id="product-unit"><option value="m2">m2</option><option value="unidade">unidade</option><option value="metro_linear">metro linear</option><option value="hora">hora</option><option value="pacote">pacote</option></select></label></div>
+              <label>Status<select id="product-active"><option value="true">Ativo</option><option value="false">Inativo</option></select></label>
+              <button class="primary">Cadastrar produto</button>
+            </form>
+          </div>
+          <div class="panel"><h2>Catalogo</h2><div id="product-list" class="mini-grid"></div></div>
+        </div>
+        <div class="panel stack-gap">
+          <h2>Ficha tecnica do produto</h2>
+          <form id="technical-form">
+            <label>Produto<select id="technical-product"></select></label>
+            <label>Materiais padrao<input id="tech-materials" placeholder="Lona 440g, Ilhos"></label>
+            <label>Equipamentos usados<input id="tech-equipment" placeholder="Plotter, Ilhoseira"></label>
+            <label>Tempo medio de producao (min)<input id="tech-minutes" type="number" value="60"></label>
+            <label>Setores obrigatorios<input id="tech-sectors" placeholder="Arte, Impressao, Acabamento"></label>
+            <label>Acabamentos possiveis<input id="tech-finishes" placeholder="Bainha, Ilhos, Verniz"></label>
+            <label>Perda tecnica padrao (%)<input id="tech-waste" type="number" value="8"></label>
+            <label>Observacoes de producao<input id="tech-notes"></label>
+            <button class="primary">Salvar ficha tecnica</button>
+          </form>
+          <div id="technical-preview" class="price-box"></div>
+        </div>
+      </section>
+
+      <section id="admin" class="view">
+        <div class="title"><div><h1>Questionario personalizavel</h1><p>Monte perguntas por produto e defina como cada resposta impacta o orcamento.</p></div></div>
+        <div class="module-tabs"><button class="active">Perguntas</button><button>Tipos de campo</button><button>Impactos de preço</button><button>Regras por produto</button></div>
+        <div class="grid two">
+          <div class="panel">
+            <form id="question-form">
+              <label>Produto<select id="admin-product"></select></label>
+              <label>Código da pergunta<input id="question-key" placeholder="ex.: distância de deslocamento"></label>
+              <label>Pergunta<input id="question-label" placeholder="Qual a distancia de deslocamento?"></label>
+              <label>Tipo de campo<select id="question-type"><option value="text">Texto</option><option value="number">Numero</option><option value="boolean">Sim/Nao</option><option value="select">Selecao unica</option><option value="multiselect">Multipla escolha</option><option value="measure">Medida</option><option value="money">Valor monetario</option><option value="upload">Upload de arquivo</option></select></label>
+              <label>Opcoes para selecao<input id="question-options" placeholder="basico:0,premium:25,instalacao:120"></label>
+              <label>Tipo de impacto<select id="impact-type"><option value="fixed">Soma valor fixo</option><option value="perM2">Soma por m2</option><option value="perLinearMeter">Soma por metro linear</option><option value="perUnit">Soma por unidade</option><option value="perKm">Soma por km de deslocamento</option><option value="laborHours">Soma por hora/homem</option><option value="percent">Soma percentual</option></select></label>
+              <label>Valor do impacto<input id="impact-value" type="number" value="0"></label>
+              <label>Material adicionado<input id="impact-material" placeholder="Ex.: ACM, lona, fonte"></label>
+              <label>Etapa/setor responsavel<input id="impact-sector" placeholder="Ex.: Instalacao"></label>
+              <button class="primary">Adicionar pergunta</button>
+            </form>
+          </div>
+          <div class="panel"><h2>Perguntas do produto</h2><div id="admin-question-list"></div></div>
+        </div>
+      </section>
+
+      <section id="control" class="view">
+        <div class="title"><div><h1>Controle</h1><p>Venda rápida, pagamento de O.S., caixa, fechamento cego, resumo diário e liberação de acesso.</p></div></div>
+        <div class="module-tabs"><button>Venda rápida</button><button class="active">Registrar pagamento de O.S.</button><button>Caixa</button><button>Fechamento cego</button><button>Resumo diário</button><button>Liberação de acesso</button></div>
+        <div class="grid two">
+          <div class="panel">
+            <h2>Registrar pagamento de O.S.</h2>
+            <form id="order-payment-form">
+              <label>Número da O.S.<select id="pay-order"></select></label>
+              <label>Cliente<input id="pay-customer" readonly></label>
+              <label>Vendedor<input id="pay-seller" value="Joao Victor"></label>
+              <label>Valor total<input id="pay-total" readonly></label>
+              <label>Status do pagamento<select id="pay-status"><option>Faturamento total</option><option>Pagamento parcial</option><option>Pagamento de sinal</option><option>Pendente de pagamento</option><option>Fiado/prazo</option></select></label>
+              <div class="payment-grid">
+                <label>Pix<input id="pay-pix" type="number" value="0"></label>
+                <label>Crédito<input id="pay-credit" type="number" value="0"></label>
+                <label>Débito<input id="pay-debit" type="number" value="0"></label>
+                <label>Dinheiro<input id="pay-cash" type="number" value="0"></label>
+                <label>Transferencia<input id="pay-transfer" type="number" value="0"></label>
+                <label>Boleto<input id="pay-boleto" type="number" value="0"></label>
+                <label>Outros<input id="pay-other" type="number" value="0"></label>
+              </div>
+              <label>Observação<input id="pay-notes"></label>
+              <button class="primary">Gerar venda no caixa</button>
+            </form>
+          </div>
+          <div class="panel">
+            <h2>Liberação de acesso</h2>
+            <form id="permissions-form" class="check-grid">
+              <label><input type="checkbox" data-permission="cash"> Caixa</label>
+              <label><input type="checkbox" data-permission="quickSale"> Venda rápida</label>
+              <label><input type="checkbox" data-permission="blindClose"> Fechamento cego</label>
+              <label><input type="checkbox" data-permission="financialSummary"> Resumo financeiro</label>
+              <label><input type="checkbox" data-permission="production"> Produção</label>
+              <label><input type="checkbox" data-permission="quote"> Orçamento</label>
+              <label><input type="checkbox" data-permission="commercial"> CRM comercial</label>
+              <label><input type="checkbox" data-permission="customerPortal"> Portal do cliente</label>
+              <label><input type="checkbox" data-permission="bi"> BI executivo</label>
+              <label><input type="checkbox" data-permission="integrations"> Integrações</label>
+              <label><input type="checkbox" data-permission="settings"> Configurações</label>
+              <button class="primary">Salvar permissões</button>
+            </form>
+            <p>Somente Admin Geral pode alterar permissões.</p>
+          </div>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel"><h2>Resumo diário do caixa</h2><div id="daily-summary" class="mini-grid"></div></div>
+          <div class="panel"><h2>Fechamento cego</h2><p>O operador informa valores no módulo Caixa/PDV. Admin/Gestor vê esperado, informado, diferença, sobra e falta.</p><div id="control-blind-note" class="price-box"></div></div>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel"><h2>Alertas automaticos</h2><div id="alerts-list" class="alert-list"></div></div>
+          <div class="panel"><h2>Auditoria</h2><div id="audit-list" class="timeline"></div></div>
+        </div>
+        <div class="panel stack-gap"><h2>Estoque de materiais</h2><table><thead><tr><th>Material</th><th>Un.</th><th>Estoque</th><th>Minimo</th><th>Custo</th></tr></thead><tbody id="materials-table"></tbody></table></div>
+      </section>
+
+      <section id="integrations" class="view">
+        <div class="title"><div><h1>Sistema > Conexões externas</h1><p>Configurações preparadas para WhatsApp, e-mail, PIX, fiscal, TEF, Drive, backups e avisos automáticos.</p></div></div>
+        <div class="module-tabs"><button class="active">Conexões</button><button>Mensagens</button><button>PIX</button><button>Fiscal</button><button>TEF</button><button>Drive</button><button>Envios automáticos</button><button>Backup</button><button>Registros</button></div>
+        <div class="grid two">
+          <div class="panel"><h2>Conectores futuros</h2><div id="integration-connectors" class="mini-grid"></div></div>
+          <div class="panel">
+            <h2>Preparar mensagem</h2>
+            <form id="integration-message-form">
+              <div class="form-row"><label>Canal<select id="integration-channel"><option>WhatsApp</option><option>E-mail</option><option>PIX</option></select></label><label>Evento<input id="integration-event" value="orcamento aprovado"></label></div>
+              <label>Cliente<select id="integration-customer"></select></label>
+              <label>Modelo<input id="integration-template" value="Olá {{cliente}}, seu orçamento {{orcamento}} foi aprovado."></label>
+              <button class="primary">Enfileirar mensagem</button>
+            </form>
+          </div>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel"><h2>Webhooks</h2><div id="integration-webhooks" class="mini-grid"></div></div>
+          <div class="panel"><h2>Backups e automacoes</h2><div id="integration-backups" class="mini-grid"></div><div id="integration-automations" class="mini-grid"></div></div>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel"><h2>Conexões preparadas</h2><div id="integration-structures"></div></div>
+          <div class="panel"><h2>Registros de integração</h2><div id="integration-logs" class="timeline"></div></div>
+        </div>
+      </section>
+
+      <section id="settings" class="view">
+        <div class="title"><div><h1>Sistema > Configurações</h1><p>Configurações avançadas de custos, funcionários e despesas. Acesso Admin Geral.</p></div></div>
+        <div class="module-tabs"><button>Usuários</button><button>Permissões de acesso</button><button>Formas de pagamento</button><button>Produtos</button><button>Questionários</button><button>Banco de composições</button><button>Centro de custos</button><button class="active">Custos</button><button>Funcionários</button><button>Logs de acesso</button></div>
+        <div class="grid two">
+          <div class="panel">
+            <h2>Configuração de custos</h2>
+            <form id="cost-form">
+              <label>Modo<select id="cost-mode"><option value="manual">Manual</option><option value="automatico">Automático</option></select></label>
+              <div class="form-row"><label>Valor hora/homem<input id="cost-human-hour" type="number"></label><label>Valor hora/máquina<input id="cost-machine-hour" type="number"></label></div>
+              <div class="form-row"><label>Custo fixo mensal<input id="cost-fixed" type="number"></label><label>Custo deslocamento/km<input id="cost-km" type="number"></label></div>
+              <div class="form-row"><label>Margem padrão (%)<input id="cost-margin" type="number"></label><label>Impostos (%)<input id="cost-tax" type="number"></label></div>
+              <div class="form-row"><label>Comissão (%)<input id="cost-commission" type="number"></label><label>Perda técnica (%)<input id="cost-waste" type="number"></label></div>
+              <label>Regra para liberar producao<select id="cost-production-rule"><option value="produzir_somente_pago">Produzir somente pago</option><option value="produzir_com_sinal">Produzir com sinal</option><option value="produzir_fiado_autorizado">Produzir fiado autorizado</option><option value="produzir_sem_pagamento_com_autorizacao">Produzir sem pagamento com autorizacao</option></select></label>
+              <button class="primary">Salvar custos</button>
+            </form>
+          </div>
+          <div class="panel"><h2>Despesas</h2><form id="expense-form"><label>Tipo<select id="expense-type"><option>Aluguel</option><option>Energia</option><option>Internet</option><option>Água</option><option>Salários</option><option>Manutenção</option><option>Material</option><option>Combustível</option><option>Terceirizados</option><option>Outros</option></select></label><label>Descrição<input id="expense-description"></label><label>Valor<input id="expense-amount" type="number"></label><button class="primary">Adicionar despesa</button></form><div id="expenses-list" class="mini-grid"></div></div>
+        </div>
+        <div class="panel stack-gap">
+          <h2>Funcionários</h2>
+          <form id="employee-form" class="inline-form">
+            <input id="employee-name" placeholder="Nome">
+            <input id="employee-role" placeholder="Cargo">
+            <input id="employee-sector" placeholder="Setor">
+            <input id="employee-salary" type="number" placeholder="Salário">
+            <input id="employee-hours" type="number" value="176" placeholder="Carga horária">
+            <input id="employee-commission" type="number" value="0" placeholder="Comissão %">
+            <button class="primary">Cadastrar</button>
+          </form>
+          <table><thead><tr><th>Nome</th><th>Cargo</th><th>Setor</th><th>Salário</th><th>Horas/mês</th><th>Valor hora</th><th>Comissão</th><th>Status</th></tr></thead><tbody id="employees-table"></tbody></table>
+        </div>
+        <div class="grid two stack-gap">
+          <div class="panel">
+            <h2>Banco de composições</h2>
+            <form id="composition-form">
+              <label>Nome<input id="composition-name" value="Nova composição"></label>
+              <label>Categoria<input id="composition-category" value="Personalizada"></label>
+              <label>Produto base<select id="composition-product"></select></label>
+              <div class="form-row"><label>Margem (%)<input id="composition-margin" type="number" value="55"></label><label>Prazo (dias)<input id="composition-deadline" type="number" value="3"></label></div>
+              <label>Fluxo produtivo<input id="composition-flow" placeholder="Arte, Impressão, Acabamento"></label>
+              <button class="primary">Criar composição básica</button>
+            </form>
+            <div id="composition-list" class="mini-grid"></div>
+          </div>
+          <div class="panel">
+            <h2>Centro de custos</h2>
+            <form id="cost-center-form">
+              <label>Nome<input id="cost-center-name" value="Novo setor"></label>
+              <label>Tipo<select id="cost-center-type"><option value="direto">Direto</option><option value="indireto">Indireto</option></select></label>
+              <label>Orçamento mensal<input id="cost-center-budget" type="number" value="0"></label>
+              <button class="primary">Adicionar centro</button>
+            </form>
+            <div id="cost-center-list" class="mini-grid"></div>
+          </div>
+        </div>
+        <div class="panel stack-gap">
+          <div class="title"><div><h2>Sistema > Auditoria > Validacao ERP</h2><p>Validacao completa do Nivel 2 antes do Nivel 3.</p></div><button id="refresh-validation">Executar validacao</button></div>
+          <div id="validation-summary" class="cards compact"></div>
+          <div id="validation-decision" class="price-box"></div>
+          <div id="validation-sections" class="validation-list"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

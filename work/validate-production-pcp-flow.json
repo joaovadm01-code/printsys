@@ -1,0 +1,31 @@
+{
+  "generatedAt": "2026-06-19T14:19:09.250Z",
+  "base": "http://localhost:3000",
+  "approvedOrderId": "OS-1071",
+  "approvedStatuses": [
+    "Aguardando producao",
+    "Aguardando producao",
+    "Aguardando producao",
+    "Aguardando producao",
+    "Homologacao pendente"
+  ],
+  "approvedFinalStatus": "Liberada para entrega",
+  "reworkOrderId": "OS-1072",
+  "reworkStatuses": [
+    "Aguardando producao",
+    "Aguardando producao",
+    "Aguardando producao",
+    "Aguardando producao",
+    "Homologacao pendente"
+  ],
+  "reworkFinalStatus": "Retrabalho",
+  "checks": {
+    "O.S. aprovada liberada": true,
+    "O.S. reprovada em retrabalho": true,
+    "Historico aprovado possui eventos": true,
+    "Historico retrabalho possui eventos": true,
+    "Anexos consultaveis": true,
+    "PCP respondeu com linhas": true
+  },
+  "failed": []
+}

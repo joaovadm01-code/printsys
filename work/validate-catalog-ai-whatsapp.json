@@ -1,0 +1,42 @@
+{
+  "generatedAt": "2026-06-20T11:02:33.055Z",
+  "baseUrl": "http://localhost:3000",
+  "steps": [
+    {
+      "name": "login_admin",
+      "status": "ok"
+    },
+    {
+      "name": "catalog_loaded",
+      "categories": 10,
+      "products": 38,
+      "productId": "p1"
+    },
+    {
+      "name": "product_catalog_saved",
+      "imageUrl": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='180' viewBox='0 0 320 180'%3E%3Crect width='320' height='180' fill='%237b179f'/%3E%3Ctext x='160' y='96' text-anchor='middle' font-family='Arial' font-size='22' fill='white'%3Eprintsys-produto%3C/text%3E%3C/svg%3E",
+      "attachments": 2
+    },
+    {
+      "name": "project_recognition",
+      "analysisId": "analysis-62333",
+      "suggestions": 5,
+      "mode": "keyword_fallback"
+    },
+    {
+      "name": "quote_draft_ready",
+      "items": 2,
+      "total": 7010.68
+    },
+    {
+      "name": "communication_settings",
+      "mode": "manual_whatsapp_link",
+      "testStatus": "manual"
+    },
+    {
+      "name": "notification_manual_flow",
+      "notificationId": "ntf-31699",
+      "status": "manual_confirmed"
+    }
+  ]
+}

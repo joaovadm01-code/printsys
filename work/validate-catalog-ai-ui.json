@@ -1,0 +1,28 @@
+{
+  "generatedAt": "2026-06-20T11:02:38.532Z",
+  "baseUrl": "http://localhost:3000",
+  "screenshots": {
+    "products": "work/catalog-ai-products.png",
+    "quote": "work/catalog-ai-quote.png",
+    "communication": "work/catalog-ai-communication.png"
+  },
+  "checks": [
+    {
+      "name": "products_catalog",
+      "productCards": 12,
+      "productRows": 38,
+      "status": "ok"
+    },
+    {
+      "name": "quote_project_recognition",
+      "suggestions": 5,
+      "status": "ok"
+    },
+    {
+      "name": "communication_settings_screen",
+      "mode": "manual_whatsapp_link",
+      "status": "ok"
+    }
+  ],
+  "consoleErrors": []
+}

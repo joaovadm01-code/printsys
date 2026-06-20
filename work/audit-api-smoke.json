@@ -1,0 +1,256 @@
+{
+  "generatedAt": "2026-06-19T13:24:36.145Z",
+  "base": "http://localhost:3000",
+  "total": 31,
+  "passed": 31,
+  "failed": [],
+  "results": [
+    {
+      "path": "/api/auth/login",
+      "method": "POST",
+      "status": 200,
+      "ok": true,
+      "empty": false
+    },
+    {
+      "path": "/api/auth/status",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/me",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/dashboard",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/customers",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": true
+    },
+    {
+      "path": "/api/products",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/products/grouped",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/compositions",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/quotes",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/reports/quoted-approved",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": true
+    },
+    {
+      "path": "/api/orders",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/production/orders",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/production/pcp",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/production/reports",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/materials",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/finance",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/finance/receivables",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": true
+    },
+    {
+      "path": "/api/finance/payables",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": true,
+      "allowEmpty": true
+    },
+    {
+      "path": "/api/dre",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/cash/report",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/cash/daily-summary",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/operational-expenses",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": true,
+      "allowEmpty": true
+    },
+    {
+      "path": "/api/vehicles",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/cost-centers",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/employees",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/sectors",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/technical-visits",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": true
+    },
+    {
+      "path": "/api/intelligence",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/search/global?q=OS",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": false
+    },
+    {
+      "path": "/api/alerts",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": true
+    },
+    {
+      "path": "/api/audit",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "empty": false,
+      "allowEmpty": true
+    }
+  ]
+}

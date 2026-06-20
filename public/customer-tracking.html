@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acompanhar Pedido | PrintSys</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="portal-tracking-page">
+  <main class="tracking-shell">
+    <section class="tracking-card">
+      <div class="focused-page-head">
+        <div>
+          <span>Portal do cliente</span>
+          <h1>Acompanhar pedido</h1>
+          <p>Consulte suas ordens de servico com CPF/CNPJ e WhatsApp, ou pelo link enviado pela empresa.</p>
+        </div>
+      </div>
+      <form id="tracking-form" class="tracking-form">
+        <label>CPF/CNPJ<input id="tracking-document" placeholder="Digite apenas seus dados" autocomplete="off"></label>
+        <label>WhatsApp<input id="tracking-whatsapp" placeholder="DDD + numero" autocomplete="off"></label>
+        <button class="primary">Consultar</button>
+      </form>
+      <div id="tracking-message" class="login-message"></div>
+    </section>
+    <section id="tracking-results" class="tracking-results"></section>
+  </main>
+  <script src="/customer-tracking.js"></script>
+</body>
+</html>

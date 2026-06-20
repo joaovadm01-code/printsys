@@ -1,0 +1,17 @@
+{
+  "name": "printsys-erp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PrintSys ERP/PDV para grafica e comunicacao visual",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "migrate": "node scripts/migrate.js",
+    "seed": "node scripts/seed.js",
+    "check": "node --check server.js && node --check public/app.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {}
+}
