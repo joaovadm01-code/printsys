@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-06-20T15:17:49.121Z",
+  "baseUrl": "http://localhost:3000",
+  "stock": {
+    "materialId": "m1",
+    "materialName": "Lona 440g",
+    "original": 180,
+    "finalBalance": 180,
+    "movementIds": [
+      "stk-45876",
+      "stk-44218",
+      "stk-27693"
+    ]
+  },
+  "visits": {
+    "visitId": "visit-44416",
+    "customerName": "Mercado Sao Luis",
+    "responsible": "Ana Paula",
+    "status": "completed",
+    "measurementNotes": "Medidas finais: 2,00 x 1,00m. Parede lisa."
+  },
+  "ui": {
+    "stockMetrics": {
+      "hasForm": true,
+      "hasHistory": true,
+      "buttonCount": 4,
+      "oversizedCards": 0
+    },
+    "visitMetrics": {
+      "hasForm": true,
+      "hasCustomerSelect": true,
+      "hasResponsibleSelect": true,
+      "formHeight": 604
+    },
+    "consoleErrors": [],
+    "failedRequests": []
+  }
+}

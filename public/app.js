@@ -1,4 +1,4 @@
-const state = { user: null, users: [], permissions: {}, sectorPermissions: {}, companies: [], currentCompanyId: localStorage.getItem("printsys_company_id") || "", currentCompanyName: "", companySettings: {}, printSettings: {}, communicationSettings: {}, notifications: { queue: [], templates: [] }, productCatalog: { categories: [], products: [], favorites: [], recentlyUsed: [], summary: {} }, productCategories: [], projectRecognition: { analyses: [], active: null, draft: null }, activeMenu: null, costConfig: {}, costCenters: [], sectors: [], compositions: [], pricingSimulations: [], activeSimulation: null, activeQuotePricing: null, quoteItems: [], quoteItemDraftAnswers: {}, selectedProductionOrderId: null, productionScope: "today", productionView: "mine", productionQuery: { rows: [], summary: {}, filters: {} }, productionMovements: { rows: [], summary: {}, filters: {} }, activeOrderDetailTab: "items", activeOrderProductDraftId: null, expandedProductId: "", productConfigDraft: { technicalQuestions: [], productionRoute: [] }, productModelQuestionDraft: [], quotedApprovedReport: [], validationReport: null, cashReport: {}, financeData: {}, crm: { leads: [], followUps: [], sellerGoals: [], report: {}, alerts: [], funnelStages: [] }, intelligence: {}, analytics: {}, preferences: {}, biData: {}, integrations: {}, portalData: null, portalToken: "portal-c1-demo", employees: [], expenses: [], operationalExpenses: [], expenseCategories: [], expenseReports: {}, advances: [], dre: {}, vehicles: [], technicalVisits: [], technicalVisitReports: {}, customers: [], products: [], quotes: [], orders: [], quickSales: [], materials: [], alerts: [], audit: [], dailySummary: {}, dashboard: null };
+const state = { user: null, users: [], permissions: {}, sectorPermissions: {}, companies: [], currentCompanyId: localStorage.getItem("printsys_company_id") || "", currentCompanyName: "", companySettings: {}, printSettings: {}, communicationSettings: {}, notifications: { queue: [], templates: [] }, productCatalog: { categories: [], products: [], favorites: [], recentlyUsed: [], summary: {} }, productCategories: [], projectRecognition: { analyses: [], active: null, draft: null }, activeMenu: null, costConfig: {}, costCenters: [], sectors: [], compositions: [], pricingSimulations: [], activeSimulation: null, activeQuotePricing: null, quoteItems: [], quoteItemDraftAnswers: {}, selectedProductionOrderId: null, productionScope: "today", productionView: "mine", productionQuery: { rows: [], summary: {}, filters: {} }, productionMovements: { rows: [], summary: {}, filters: {} }, activeOrderDetailTab: "items", activeOrderProductDraftId: null, expandedProductId: "", productConfigDraft: { technicalQuestions: [], productionRoute: [] }, productModelQuestionDraft: [], quotedApprovedReport: [], validationReport: null, cashReport: {}, financeData: {}, crm: { leads: [], followUps: [], sellerGoals: [], report: {}, alerts: [], funnelStages: [] }, intelligence: {}, analytics: {}, preferences: {}, biData: {}, integrations: {}, portalData: null, portalToken: "portal-c1-demo", employees: [], expenses: [], operationalExpenses: [], expenseCategories: [], expenseReports: {}, advances: [], dre: {}, vehicles: [], technicalVisits: [], technicalVisitReports: {}, customers: [], products: [], quotes: [], orders: [], quickSales: [], materials: [], stockMovements: [], alerts: [], audit: [], dailySummary: {}, dashboard: null };
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 
 function formatDateTime(value) {
@@ -242,7 +242,7 @@ function canUsePermission(permission) {
 }
 
 async function loadAll() {
-  const [session, users, dashboard, customers, products, productCatalog, quotes, orders, productionMovements, quickSales, materials, alerts, audit, dailySummary, cashReport, financeData, crm, intelligence, analytics, preferences, biData, integrations, printSettings, communicationSettings, notifications, portalData, costConfig, costCenters, sectors, compositions, pricingSimulations, quotedApprovedReport, validationReport, employees, expenses, operationalExpenses, expenseCategories, expenseReports, advances, dre, vehicles, technicalVisits, technicalVisitReports] = await Promise.all([
+  const [session, users, dashboard, customers, products, productCatalog, quotes, orders, productionMovements, quickSales, materials, stockMovements, alerts, audit, dailySummary, cashReport, financeData, crm, intelligence, analytics, preferences, biData, integrations, printSettings, communicationSettings, notifications, portalData, costConfig, costCenters, sectors, compositions, pricingSimulations, quotedApprovedReport, validationReport, employees, expenses, operationalExpenses, expenseCategories, expenseReports, advances, dre, vehicles, technicalVisits, technicalVisitReports] = await Promise.all([
     api("/api/me"),
     apiOptional("/api/users", []),
     apiOptional("/api/dashboard", {}),
@@ -254,6 +254,7 @@ async function loadAll() {
     apiOptional("/api/production/movements", { rows: [], summary: {}, filters: {} }),
     apiOptional("/api/quick-sales", []),
     apiOptional("/api/materials", []),
+    apiOptional("/api/stock-movements", []),
     apiOptional("/api/alerts", []),
     apiOptional("/api/audit", []),
     apiOptional("/api/cash/daily-summary", {}),
@@ -306,6 +307,7 @@ async function loadAll() {
   state.productionMovements = productionMovements || { rows: [], summary: {}, filters: {} };
   state.quickSales = quickSales;
   state.materials = materials;
+  state.stockMovements = stockMovements;
   state.alerts = alerts;
   state.audit = audit;
   state.dailySummary = dailySummary;
@@ -3902,53 +3904,166 @@ function renderDashboardBusinessView() {
   const today = new Date().toISOString().slice(0, 10);
   const todayOrders = (state.orders || []).filter(order => String(order.dueDate || "").slice(0, 10) === today).length || dashboard.todayOrders || 0;
   const pendingQuotes = (state.quotes || []).filter(quote => !String(quote.status || "").toLowerCase().includes("aprov")).length || dashboard.todayQuotes || 0;
-  safeSetHTML("dashboard-cards", [
-    managerCard("O.S. para hoje", todayOrders, countStatus(todayOrders, 6, 10), "Pedidos com prazo ou entrega marcada para hoje.", "orders"),
-    managerCard("O.S. atrasadas", dashboard.lateOrders || 0, countStatus(dashboard.lateOrders, 1, 3), "Pedidos fora do prazo combinado com o cliente.", "orders"),
-    managerCard("O.S. em producao", dashboard.productionRunning || 0, countStatus(dashboard.productionRunning, 8, 15), "Trabalhos que estao rodando na producao agora.", "pcp"),
-    managerCard("Aguardando aprovacao", dashboard.awaitingApproval || pendingQuotes, countStatus(dashboard.awaitingApproval || pendingQuotes, 8, 15), "Propostas ou O.S. que ainda dependem de aprovacao.", "quote"),
-    managerCard("Aguardando pagamento", dashboard.awaitingPayment || 0, countStatus(dashboard.awaitingPayment, 1, 5), "O.S. com saldo ou sinal pendente.", "cash"),
-    managerCard("Proximos 3 dias", dashboard.next3Production || 0, countStatus(dashboard.next3Production, 8, 15), "Fila produtiva prevista para os proximos tres dias.", "pcp"),
-    managerCard("Visitas do dia", dashboard.todayVisits || 0, countStatus(dashboard.todayVisits, 4, 8), "Medicoes e visitas tecnicas programadas para hoje.", "visits-agenda"),
-    managerCard("Visitas pendentes", dashboard.pendingVisits || 0, countStatus(dashboard.pendingVisits, 1, 5), "Visitas aguardando conclusao ou reagendamento.", "visits-open"),
-    managerCard("Contas a receber", money.format(dashboard.accountsReceivable || dashboard.pendingReceivables || 0), countStatus(dashboard.accountsReceivable || dashboard.pendingReceivables, 1, 5000), "Valores pendentes no financeiro.", "finance-receivables"),
-    managerCard("Contas a pagar", money.format(dashboard.accountsPayable || 0), countStatus(dashboard.accountsPayable, 1, 5000), "Compromissos financeiros cadastrados.", "finance-payables"),
-    managerCard("Caixa do dia", money.format(dashboard.todayCash || 0), dashboard.todayCash >= 0 ? "ok" : "critical", "Saldo movimentado hoje no caixa.", "cash"),
-    managerCard("Faturamento do mes", money.format(dashboard.monthRevenue || dashboard.revenue || 0), revenueStatus(dashboard.monthRevenue || dashboard.revenue), "Entradas registradas no mes atual.", "finance"),
-    managerCard("Produtos vendidos", dashboard.topProducts?.[0]?.name || "Sem vendas", dashboard.topProducts?.length ? "ok" : "warning", dashboard.topProducts?.[0] ? `${money.format(dashboard.topProducts[0].value)} no periodo.` : "Nenhum produto vendido no periodo.", "reports-orders"),
-    managerCard("Maior margem", dashboard.highestMarginServices?.[0]?.name || "Sem margem", dashboard.highestMarginServices?.length ? "ok" : "warning", dashboard.highestMarginServices?.[0] ? `${dashboard.highestMarginServices[0].margin}% de margem prevista.` : "Sem O.S. com margem calculada.", "reports-finance"),
-    managerCard("Caixa", dashboard.cashOpen ? "Aberto" : "Fechado", dashboard.cashOpen ? "ok" : "warning", "Situacao atual do caixa operacional.", "cash"),
-    managerCard("Alertas", alerts, countStatus(alerts, 1, 3), "Pontos que precisam de decisao.", alerts ? "orders" : "dashboard")
-  ].join(""), true);
-  document.querySelectorAll("#dashboard-cards [data-view]").forEach(button => button.addEventListener("click", () => view(button.dataset.view)));
+  prepareDashboardWorkCenter();
+  const kpis = [
+    dashboardKpi("O.S. para hoje", todayOrders, countStatus(todayOrders, 6, 10), "orders-search"),
+    dashboardKpi("O.S. atrasadas", dashboard.lateOrders || 0, countStatus(dashboard.lateOrders, 1, 3), "orders-late"),
+    dashboardKpi("Em producao", dashboard.productionRunning || 0, countStatus(dashboard.productionRunning, 8, 15), "production-pcp"),
+    dashboardKpi("Aguardando aprovacao", dashboard.awaitingApproval || pendingQuotes, countStatus(dashboard.awaitingApproval || pendingQuotes, 8, 15), "quote"),
+    dashboardKpi("Aguardando pagamento", dashboard.awaitingPayment || 0, countStatus(dashboard.awaitingPayment, 1, 5), "cash-receive"),
+    dashboardKpi("Proximos 3 dias", dashboard.next3Production || 0, countStatus(dashboard.next3Production, 8, 15), "production-pcp"),
+    dashboardKpi("Contas a receber", money.format(dashboard.accountsReceivable || dashboard.pendingReceivables || 0), countStatus(dashboard.accountsReceivable || dashboard.pendingReceivables, 1, 5000), "finance-receivables"),
+    dashboardKpi("Faturamento do mes", money.format(dashboard.monthRevenue || dashboard.revenue || 0), revenueStatus(dashboard.monthRevenue || dashboard.revenue), "finance-cashflow")
+  ];
+  safeSetHTML("dashboard-cards", kpis.join(""), true);
 
   const quickPanel = document.getElementById("quick-panel");
-  if (!quickPanel) return;
-  quickPanel.classList.add("action-bar", "quick-actions");
-  quickPanel.innerHTML = [
-    quickAction("quote", "Novo orcamento", "Criar proposta"),
-    quickAction("orders", "Nova O.S.", "Acompanhar pedido"),
-    quickAction("cash", "Abrir caixa", "Iniciar atendimento"),
-    quickAction("cash", "Venda rapida", "Balcao sem O.S."),
-    quickAction("pcp", "Ver producao", "Conferir PCP")
-  ].join("");
-  quickPanel.querySelectorAll("[data-view]").forEach(button => {
-    button.addEventListener("click", () => view(button.dataset.view));
-  });
-  const tasks = document.getElementById("tasks");
-  if (tasks) {
-    tasks.innerHTML = `
-      <div class="dashboard-lists">
-        ${dashboardList("Ultimas O.S.", state.orders || [], order => `${order.id} - ${order.customerName || "Cliente"} - ${order.productionStatus || "Aguardando"}`)}
-        ${dashboardList("Producao do dia", (state.orders || []).filter(order => String(order.productionStatus || "").toLowerCase().includes("produ")).slice(0, 5), order => `${order.id} - ${order.jobName || "Servico"} - ${order.dueDate || "Sem prazo"}`)}
-        ${dashboardList("Orcamentos recentes", state.quotes || [], quote => `${quote.quoteNumber || quote.id} - ${customerName(quote.customerId)} - ${quote.status || "Rascunho"}`)}
-      </div>
-    `;
+  if (quickPanel) {
+    quickPanel.innerHTML = [
+      quickAction("quote", "Novo orcamento", "Criar proposta", "OR"),
+      quickAction("orders-new", "Nova O.S.", "Gerar pedido", "OS"),
+      quickAction("production-pcp", "Producao", "Conferir PCP", "PC"),
+      quickAction("cash-receive", "Caixa", "Receber venda", "CX"),
+      quickAction("finance-receivables", "A receber", "Cobrar cliente", "AR"),
+      quickAction("finance-payables", "A pagar", "Conferir contas", "AP"),
+      quickAction("customers", "Clientes", "Consultar base", "CL"),
+      quickAction("stock-products", "Produtos", "Catalogo", "PR"),
+      quickAction("reports-orders", "Relatorios", "Analisar dados", "RE")
+    ].join("");
   }
+
+  safeSetHTML("important-alerts", dashboardNoticeRows(dashboard, todayOrders, pendingQuotes).join(""), true);
+  safeSetHTML("tasks", dashboardTaskRows(dashboard, todayOrders, pendingQuotes).join(""), true);
+  safeSetHTML("dashboard-company-widget", dashboardCompanyWidget(dashboard, alerts), true);
+  safeSetHTML("dashboard-operational-summary", dashboardOperationalSummary(dashboard, todayOrders, pendingQuotes), true);
+  document.querySelectorAll("#dashboard [data-view]").forEach(button => button.addEventListener("click", () => view(button.dataset.view, button)));
 }
 
-function quickAction(target, title, subtitle) {
-  return `<button type="button" class="quick-action" data-view="${target}"><b>${title}</b><span>${subtitle}</span></button>`;
+function prepareDashboardWorkCenter() {
+  const dashboard = document.getElementById("dashboard");
+  if (!dashboard || dashboard.dataset.workCenterReady === "true") return;
+  dashboard.dataset.workCenterReady = "true";
+  dashboard.classList.add("dashboard-work-center");
+  dashboard.innerHTML = `
+    <section class="home-work-center">
+      <div class="home-main">
+        <section class="home-welcome-card">
+          <div class="home-avatar">${userInitials()}</div>
+          <div>
+            <span>PrintSys ERP</span>
+            <h1>Welcome back, ${escapeHtml(state.user?.name || "Joao Victor")}</h1>
+            <p id="dashboard-operational-summary">Carregando resumo operacional...</p>
+          </div>
+        </section>
+        <section class="home-panel">
+          <div class="home-section-head"><div><span>Acesso rapido</span><h2>Comece o trabalho</h2></div></div>
+          <div id="quick-panel" class="home-shortcuts"></div>
+        </section>
+        <section class="home-panel">
+          <div class="home-section-head"><div><span>Avisos</span><h2>Alertas e pendencias</h2></div><button type="button" data-view="notifications-center">Ver notificacoes</button></div>
+          <div id="important-alerts" class="home-notices"></div>
+        </section>
+      </div>
+      <aside class="home-side">
+        <section class="home-panel home-kpi-panel">
+          <div class="home-section-head"><div><span>Indicadores</span><h2>Resumo compacto</h2></div></div>
+          <div id="dashboard-cards" class="home-kpi-strip"></div>
+        </section>
+        <section id="dashboard-company-widget" class="home-company-widget"></section>
+        <section class="home-panel">
+          <div class="home-section-head"><div><span>Tarefas</span><h2>O que fazer agora</h2></div></div>
+          <div id="tasks" class="home-tasks"></div>
+        </section>
+      </aside>
+    </section>
+  `;
+}
+
+function userInitials() {
+  return (state.user?.name || "Joao Victor").split(" ").filter(Boolean).slice(0, 2).map(part => part[0]).join("").toUpperCase() || "JV";
+}
+
+function dashboardOperationalSummary(dashboard = {}, todayOrders = 0, pendingQuotes = 0) {
+  const date = new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" });
+  const store = state.currentCompanyName || state.companySettings?.name || "Loja Principal";
+  const late = dashboard.lateOrders || 0;
+  const running = dashboard.productionRunning || 0;
+  return `${store} - ${date}. Hoje voce tem ${todayOrders} O.S. para acompanhar, ${running} em producao, ${pendingQuotes} aprovacao(oes) pendente(s) e ${late} atraso(s) pedindo atencao.`;
+}
+
+function dashboardKpi(title, value, status = "ok", target = "dashboard") {
+  return `
+    <button type="button" class="home-kpi status-${status}" data-view="${target}">
+      <span>${title}</span>
+      <b>${value}</b>
+      <small>${managerStatusLabel(status)}</small>
+    </button>
+  `;
+}
+
+function quickAction(target, title, subtitle, icon = "PS") {
+  return `<button type="button" class="quick-action" data-view="${target}"><i>${icon}</i><b>${title}</b><span>${subtitle}</span></button>`;
+}
+
+function dashboardNoticeRows(dashboard = {}, todayOrders = 0, pendingQuotes = 0) {
+  const rows = (dashboard.importantAlerts || []).slice(0, 5).map(alert => ({
+    title: businessLabel(alert.type),
+    text: alert.message || "Verifique este ponto antes de avancar.",
+    severity: alert.severity || "warning",
+    view: dashboardAlertView(alert)
+  }));
+  if (dashboard.lateOrders) rows.push({ title: "O.S. atrasadas", text: `${dashboard.lateOrders} pedido(s) fora do prazo combinado.`, severity: "red", view: "orders-late" });
+  if (dashboard.awaitingPayment) rows.push({ title: "Pagamentos pendentes", text: `${dashboard.awaitingPayment} O.S. aguardando sinal, pagamento ou liberacao.`, severity: "yellow", view: "cash-receive" });
+  if (dashboard.pendingVisits) rows.push({ title: "Visitas pendentes", text: `${dashboard.pendingVisits} visita(s) aguardando conclusao ou reagendamento.`, severity: "yellow", view: "visits-open" });
+  if (pendingQuotes) rows.push({ title: "Aprovacoes comerciais", text: `${pendingQuotes} proposta(s) ou O.S. dependem de aprovacao.`, severity: "green", view: "quote" });
+  if (!rows.length) rows.push({ title: "Operacao em ordem", text: "Nenhum alerta critico encontrado agora.", severity: "green", view: "dashboard" });
+  return rows.slice(0, 7).map(item => `
+    <button type="button" class="home-notice ${item.severity}" data-view="${item.view}">
+      <b>${item.title}</b>
+      <span>${item.text}</span>
+      <small>Abrir modulo</small>
+    </button>
+  `);
+}
+
+function dashboardTaskRows(dashboard = {}, todayOrders = 0, pendingQuotes = 0) {
+  const running = dashboard.productionRunning || 0;
+  const receivable = dashboard.accountsReceivable || dashboard.pendingReceivables || 0;
+  const rows = [
+    { title: "Producao", text: running ? `${running} trabalho(s) em execucao para acompanhar.` : "Conferir fila e liberar proximas O.S.", view: "production-pcp", tag: "PCP" },
+    { title: "Financeiro", text: receivable ? `${money.format(receivable)} em contas a receber.` : "Conferir recebimentos do dia.", view: "finance-receivables", tag: "R$" },
+    { title: "Clientes", text: "Revisar retornos, visitas e contatos pendentes.", view: "commercial", tag: "CRM" },
+    { title: "Aprovacoes", text: pendingQuotes ? `${pendingQuotes} proposta(s) aguardando decisao.` : "Sem aprovacao critica agora.", view: "quote", tag: "OK" },
+    { title: "Agenda", text: dashboard.pendingVisits ? `${dashboard.pendingVisits} visita(s) para ajustar.` : "Organizar visitas tecnicas da semana.", view: "visits-agenda", tag: "AG" }
+  ];
+  return rows.map(item => `
+    <button type="button" class="home-task" data-view="${item.view}">
+      <i>${item.tag}</i>
+      <span><b>${item.title}</b><small>${item.text}</small></span>
+    </button>
+  `);
+}
+
+function dashboardCompanyWidget(dashboard = {}, alerts = 0) {
+  const store = state.currentCompanyName || state.companySettings?.name || "Loja Principal";
+  const role = state.user?.role || "Admin/Gestor";
+  const totalRecords = (state.orders?.length || 0) + (state.quotes?.length || 0) + (state.customers?.length || 0) + (state.products?.length || 0);
+  const progress = Math.min(100, Math.max(12, Math.round((totalRecords / 180) * 100)));
+  const status = alerts || dashboard.lateOrders ? "Atencao operacional" : "Sistema estavel";
+  return `
+    <div class="home-company-head">
+      <span>Empresa</span>
+      <h2>${escapeHtml(store)}</h2>
+      <p>${escapeHtml(role)} - ${status}</p>
+    </div>
+    <div class="home-company-progress"><span style="width:${progress}%"></span></div>
+    <div class="home-company-grid">
+      <div><span>Clientes</span><b>${state.customers?.length || 0}</b></div>
+      <div><span>Produtos</span><b>${state.products?.length || 0}</b></div>
+      <div><span>O.S.</span><b>${state.orders?.length || 0}</b></div>
+      <div><span>Alertas</span><b>${alerts}</b></div>
+    </div>
+  `;
 }
 
 function dashboardAlertView(alert) {
@@ -5675,6 +5790,7 @@ function technicalVisitTable(visits, emptyMessage = "Nenhuma visita encontrada."
     const actions = [
       `<button type="button" data-visit-action="edit" data-visit="${visit.id}">Editar</button>`,
       visit.status === "requested" ? `<button type="button" data-visit-action="schedule" data-visit="${visit.id}">Agendar</button>` : "",
+      !["completed", "canceled"].includes(visit.status) ? `<button type="button" data-visit-action="reschedule" data-visit="${visit.id}">Reagendar</button>` : "",
       visit.status === "scheduled" ? `<button type="button" class="primary" data-visit-action="start" data-visit="${visit.id}">Iniciar</button>` : "",
       !["completed", "canceled"].includes(visit.status) ? `<button type="button" class="primary" data-visit-action="complete" data-visit="${visit.id}">Concluir</button>` : "",
       !["completed", "canceled"].includes(visit.status) ? `<button type="button" data-visit-action="cancel" data-visit="${visit.id}">Cancelar</button>` : ""
@@ -5873,11 +5989,31 @@ async function handleTechnicalVisitAction(button) {
     : action === "start" ? { status: "in_progress" }
       : action === "cancel" ? { status: "canceled" }
         : {};
+  if (action === "reschedule") {
+    const nextDate = window.prompt("Nova data e hora da visita (AAAA-MM-DDTHH:mm):", String(visit.scheduledDate || visit.requestedDate || new Date().toISOString()).slice(0, 16));
+    if (!nextDate) return;
+    body.status = "scheduled";
+    body.scheduledDate = nextDate;
+  }
+  if (action === "cancel") {
+    const reason = window.prompt("Motivo do cancelamento:", visit.cancelReason || "");
+    if (reason === null) return;
+    body.cancelReason = reason;
+    body.notes = [visit.notes, reason ? `Cancelamento: ${reason}` : ""].filter(Boolean).join("\n");
+  }
+  if (action === "complete") {
+    const measurementNotes = visit.measurementNotes || window.prompt("Informe medidas e observacoes da visita:", "");
+    if (!measurementNotes) {
+      showToast("Informe as medidas/observacoes antes de concluir a visita.", "error");
+      return;
+    }
+    body.measurementNotes = measurementNotes;
+  }
   try {
-    if (action === "complete") await api(`/api/technical-visits/${visit.id}/complete`, { method: "POST", body: { measurementNotes: visit.measurementNotes, photos: visit.photos } });
+    if (action === "complete") await api(`/api/technical-visits/${visit.id}/complete`, { method: "POST", body: { measurementNotes: body.measurementNotes, photos: visit.photos } });
     else await api(`/api/technical-visits/${visit.id}`, { method: "PATCH", body });
     await loadAll();
-    showToast(`Visita ${visitStatusLabel(action === "schedule" ? "scheduled" : action === "start" ? "in_progress" : action === "complete" ? "completed" : "canceled").toLowerCase()}.`, "success");
+    showToast(`Visita ${visitStatusLabel(action === "schedule" || action === "reschedule" ? "scheduled" : action === "start" ? "in_progress" : action === "complete" ? "completed" : "canceled").toLowerCase()}.`, "success");
   } catch (error) {
     showToast(error.message, "error");
   }
@@ -8770,6 +8906,181 @@ function focusedOrderRows(orders, columns, rowRenderer, emptyMessage) {
   return `<div class="focused-table-scroll"><table class="focused-data-table"><thead><tr>${columns.map(column => `<th>${column}</th>`).join("")}</tr></thead><tbody>${orders.map(rowRenderer).join("")}</tbody></table></div>`;
 }
 
+function stockMovementTypeLabel(type) {
+  return {
+    entry: "Entrada",
+    add: "Entrada",
+    output: "Saida",
+    remove: "Saida",
+    adjustment: "Ajuste manual",
+    manual_adjustment: "Ajuste manual"
+  }[type] || "Movimentacao";
+}
+
+function stockStatusPill(material = {}) {
+  const stock = Number(material.stock || 0);
+  const minStock = Number(material.minStock || 0);
+  if (stock < 0) return `<span class="status-pill danger">Negativo</span>`;
+  if (stock <= minStock) return `<span class="status-pill production">Critico</span>`;
+  return `<span class="status-pill finance">Disponivel</span>`;
+}
+
+function stockMovementRows(materialId = "") {
+  const rows = (state.stockMovements || [])
+    .filter(movement => !materialId || movement.materialId === materialId)
+    .slice()
+    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+    .slice(0, 25);
+  return focusedOrderRows(rows, ["Data", "Material", "Tipo", "Qtd.", "Saldo", "Responsavel", "Motivo"], movement => {
+    const delta = Number(movement.delta ?? movement.quantity ?? 0);
+    const directionClass = delta < 0 || movement.direction === "out" ? "production" : "finance";
+    const quantityText = `${delta > 0 ? "+" : ""}${roundNumber(delta || movement.quantity || 0)} ${escapeHtml(movement.unit || "")}`;
+    return `<tr>
+      <td>${formatDateTime(movement.createdAt)}</td>
+      <td><b>${escapeHtml(movement.materialName || "Material")}</b><small>${escapeHtml(movement.storeName || state.currentCompanyName || "Loja atual")}</small></td>
+      <td><span class="status-pill ${directionClass}">${stockMovementTypeLabel(movement.type)}</span></td>
+      <td>${quantityText}</td>
+      <td>${roundNumber(movement.previousBalance ?? 0)} -> <b>${roundNumber(movement.balanceAfter ?? 0)}</b></td>
+      <td>${escapeHtml(movement.responsible || movement.user || "-")}</td>
+      <td>${escapeHtml(movement.reason || movement.notes || "-")}</td>
+    </tr>`;
+  }, "Nenhuma movimentacao de estoque registrada.");
+}
+
+function roundNumber(value) {
+  const number = Number(value || 0);
+  return Number.isInteger(number) ? String(number) : number.toFixed(2).replace(".", ",");
+}
+
+function stockMovementPanel() {
+  const selectedMaterialId = document.getElementById("stock-material")?.value || state.materials[0]?.id || "";
+  const selectedMaterial = state.materials.find(material => material.id === selectedMaterialId) || state.materials[0] || {};
+  const lowStock = state.materials.filter(material => Number(material.stock || 0) <= Number(material.minStock || 0)).length;
+  const totalValue = state.materials.reduce((sum, material) => sum + Number(material.stock || 0) * Number(material.cost || 0), 0);
+  const options = state.materials.map(material => `<option value="${material.id}" ${material.id === selectedMaterial.id ? "selected" : ""}>${escapeHtml(material.name)} (${roundNumber(material.stock)} ${escapeHtml(material.unit || "")})</option>`).join("");
+  const actionValue = document.getElementById("stock-action")?.value || "entry";
+  const adjustmentClass = actionValue === "adjustment" ? "" : "is-muted";
+  return `
+    <section class="panel focused-function-card stock-balance-card">
+      <div class="panel-title-row">
+        <div>
+          <span class="eyebrow">Estoque operacional</span>
+          <h2>Saldo e lancamentos</h2>
+          <p>Registre cada entrada, saida ou ajuste com responsavel, motivo e loja.</p>
+        </div>
+        <div class="focused-actions">
+          <button type="button" data-view="stock-materials">Ver materiais</button>
+          <button type="button" data-view="orders-costs">Consumo por O.S.</button>
+        </div>
+      </div>
+      <div class="stock-summary-strip">
+        <div><span>Materiais</span><b>${state.materials.length}</b></div>
+        <div><span>Criticos</span><b>${lowStock}</b></div>
+        <div><span>Valor em estoque</span><b>${money.format(totalValue)}</b></div>
+      </div>
+      <form id="stock-movement-form" class="stock-movement-form">
+        <label>Material
+          <select id="stock-material" required>${options || `<option value="">Nenhum material cadastrado</option>`}</select>
+        </label>
+        <label>Movimento
+          <select id="stock-action" required>
+            <option value="entry" ${actionValue === "entry" ? "selected" : ""}>Entrada de estoque</option>
+            <option value="output" ${actionValue === "output" ? "selected" : ""}>Saida de estoque</option>
+            <option value="adjustment" ${actionValue === "adjustment" ? "selected" : ""}>Ajuste manual</option>
+          </select>
+        </label>
+        <label>Quantidade
+          <input id="stock-quantity" type="number" min="0" step="0.01" placeholder="0,00">
+        </label>
+        <label class="stock-adjustment-field ${adjustmentClass}">Saldo final do ajuste
+          <input id="stock-new-balance" type="number" step="0.01" placeholder="${roundNumber(selectedMaterial.stock || 0)}">
+        </label>
+        <label>Responsavel
+          <input id="stock-responsible" value="${escapeHtml(state.user?.name || "")}" required>
+        </label>
+        <label class="stock-form-wide">Motivo
+          <input id="stock-reason" placeholder="Ex.: compra, baixa para producao, inventario" required>
+        </label>
+        <label class="stock-form-wide">Autorizacao para saldo negativo
+          <input id="stock-authorized-by" placeholder="Somente quando Admin/Gestor autorizar">
+        </label>
+        <div class="stock-form-actions">
+          <button type="submit" class="primary" ${state.materials.length ? "" : "disabled"}>Registrar movimento</button>
+          <button type="button" data-stock-action="clear">Limpar</button>
+        </div>
+      </form>
+    </section>
+    <section class="panel focused-function-card stock-current-card">
+      <div class="panel-title-row">
+        <div>
+          <span class="eyebrow">Material selecionado</span>
+          <h2>${escapeHtml(selectedMaterial.name || "Selecione um material")}</h2>
+          <p>${escapeHtml(selectedMaterial.category || selectedMaterial.description || "Controle por loja atual")}</p>
+        </div>
+        ${stockStatusPill(selectedMaterial)}
+      </div>
+      <div class="stock-material-balance">
+        <span>Saldo atual</span>
+        <b>${roundNumber(selectedMaterial.stock || 0)} ${escapeHtml(selectedMaterial.unit || "")}</b>
+        <small>Minimo: ${roundNumber(selectedMaterial.minStock || 0)} | Custo: ${money.format(selectedMaterial.cost || 0)}</small>
+      </div>
+      <h3>Historico recente</h3>
+      ${stockMovementRows(selectedMaterial.id)}
+    </section>
+  `;
+}
+
+function bindStockMovementEvents() {
+  const form = document.getElementById("stock-movement-form");
+  if (form && form.dataset.bound !== "true") {
+    form.dataset.bound = "true";
+    form.addEventListener("submit", handleStockMovementSubmit);
+  }
+  ["stock-material", "stock-action"].forEach(id => {
+    const element = document.getElementById(id);
+    if (element && element.dataset.bound !== "true") {
+      element.dataset.bound = "true";
+      element.addEventListener("change", () => {
+        const container = document.getElementById("stock-movements-tools");
+        if (container) {
+          container.innerHTML = stockMovementPanel();
+          bindStockMovementEvents();
+        }
+      });
+    }
+  });
+  document.querySelectorAll("[data-stock-action='clear']").forEach(button => {
+    if (button.dataset.bound === "true") return;
+    button.dataset.bound = "true";
+    button.addEventListener("click", () => {
+      document.getElementById("stock-movement-form")?.reset();
+      document.getElementById("stock-responsible").value = state.user?.name || "";
+    });
+  });
+}
+
+async function handleStockMovementSubmit(event) {
+  event.preventDefault();
+  const type = document.getElementById("stock-action")?.value || "entry";
+  const body = {
+    materialId: document.getElementById("stock-material")?.value || "",
+    type,
+    quantity: Number(document.getElementById("stock-quantity")?.value || 0),
+    newBalance: document.getElementById("stock-new-balance")?.value ? Number(document.getElementById("stock-new-balance").value) : undefined,
+    responsible: document.getElementById("stock-responsible")?.value || state.user?.name || "",
+    reason: document.getElementById("stock-reason")?.value || "",
+    authorizedBy: document.getElementById("stock-authorized-by")?.value || ""
+  };
+  try {
+    await api("/api/stock-movements", { method: "POST", body });
+    await loadAll();
+    view("stock-movements");
+    showToast("Movimento de estoque registrado.", "success");
+  } catch (error) {
+    showToast(error.message, "error");
+  }
+}
+
 function renderFocusedOperationalSubpages() {
   if (!document.getElementById("orders-search")) return;
   renderNewOrderPreview();
@@ -9553,7 +9864,10 @@ function renderExtendedFocusedSubpages() {
   const stockMovement = document.getElementById("stock-movements-tools");
   const stockHtml = focusedOrderRows(state.materials, ["Material", "Unidade", "Estoque", "Minimo", "Custo", "Situacao"], material => `<tr><td><b>${material.name}</b></td><td>${material.unit}</td><td>${material.stock}</td><td>${material.minStock}</td><td>${money.format(material.cost || 0)}</td><td><span class="status-pill ${Number(material.stock) <= Number(material.minStock) ? "production" : "finance"}">${Number(material.stock) <= Number(material.minStock) ? "Critico" : "Disponivel"}</span></td></tr>`, "Nenhum material cadastrado.");
   if (stockReport) stockReport.innerHTML = stockHtml;
-  if (stockMovement) stockMovement.innerHTML = `<section class="panel focused-function-card"><h2>Posicao atual dos materiais</h2>${stockHtml}<div class="focused-actions"><button type="button" data-view="orders-costs">Registrar consumo por O.S.</button></div></section>`;
+  if (stockMovement) {
+    stockMovement.innerHTML = stockMovementPanel();
+    bindStockMovementEvents();
+  }
 
   const users = document.getElementById("settings-users-tools");
   if (users && !document.getElementById("settings-users-list")) {

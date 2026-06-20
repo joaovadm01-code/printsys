@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-20T13:39:54.703Z",
+  "generatedAt": "2026-06-20T15:17:58.012Z",
   "baseUrl": "http://localhost:3000",
   "views": [
     {
@@ -85,6 +85,53 @@
         "activeMenuBackground": "linear-gradient(135deg, rgb(118, 24, 154), rgb(148, 49, 182))",
         "cardRadius": "24px"
       }
+    }
+  ],
+  "shortcutChecks": [
+    {
+      "view": "quote",
+      "label": "ORNovo orçamentoCriar proposta",
+      "status": "ok"
+    },
+    {
+      "view": "orders-new",
+      "label": "OSNova O.S.Gerar pedido",
+      "status": "ok"
+    },
+    {
+      "view": "production-pcp",
+      "label": "PCProduçãoConferir PCP",
+      "status": "ok"
+    },
+    {
+      "view": "cash-receive",
+      "label": "CXCaixaReceber venda",
+      "status": "ok"
+    },
+    {
+      "view": "finance-receivables",
+      "label": "ARA receberCobrar cliente",
+      "status": "ok"
+    },
+    {
+      "view": "finance-payables",
+      "label": "APA pagarConferir contas",
+      "status": "ok"
+    },
+    {
+      "view": "customers",
+      "label": "CLClientesConsultar base",
+      "status": "ok"
+    },
+    {
+      "view": "stock-products",
+      "label": "PRProdutosCatalogo",
+      "status": "ok"
+    },
+    {
+      "view": "reports-orders",
+      "label": "RERelatoriosAnalisar dados",
+      "status": "ok"
     }
   ],
   "consoleErrors": [],

@@ -2805,6 +2805,124 @@ function alerts() {
   return list;
 }
 
+function stockMovementTypeLabel(type) {
+  return {
+    entry: "Entrada",
+    add: "Entrada",
+    output: "Saida",
+    remove: "Saida",
+    adjustment: "Ajuste manual",
+    manual_adjustment: "Ajuste manual"
+  }[type] || "Movimentacao";
+}
+
+function normalizeStockMovementType(type) {
+  const normalized = String(type || "").trim().toLowerCase();
+  if (["entry", "add", "entrada"].includes(normalized)) return "entry";
+  if (["output", "remove", "saida", "saída"].includes(normalized)) return "output";
+  if (["adjustment", "adjust", "manual_adjustment", "ajuste"].includes(normalized)) return "adjustment";
+  return "";
+}
+
+function applyStockMovement(body = {}, requestUser = db.currentUser) {
+  const material = scopedFind("materials", item => item.id === body.materialId);
+  if (!material) {
+    const error = new Error("Material nao encontrado");
+    error.statusCode = 404;
+    throw error;
+  }
+  const type = normalizeStockMovementType(body.type || body.action);
+  if (!type) {
+    const error = new Error("Tipo de movimentacao invalido");
+    error.statusCode = 400;
+    throw error;
+  }
+  const reason = String(body.reason || body.notes || "").trim();
+  if (!reason) {
+    const error = new Error("Informe o motivo da movimentacao");
+    error.statusCode = 400;
+    throw error;
+  }
+  const previousBalance = round(Number(material.stock || 0));
+  const rawQuantity = Number(body.quantity || 0);
+  let movementQuantity = rawQuantity;
+  let delta = 0;
+  let nextBalance = previousBalance;
+  if (type === "entry") {
+    if (!Number.isFinite(rawQuantity) || rawQuantity <= 0) {
+      const error = new Error("Informe uma quantidade de entrada maior que zero");
+      error.statusCode = 400;
+      throw error;
+    }
+    delta = rawQuantity;
+    nextBalance = previousBalance + rawQuantity;
+  }
+  if (type === "output") {
+    if (!Number.isFinite(rawQuantity) || rawQuantity <= 0) {
+      const error = new Error("Informe uma quantidade de saida maior que zero");
+      error.statusCode = 400;
+      throw error;
+    }
+    delta = -rawQuantity;
+    nextBalance = previousBalance - rawQuantity;
+  }
+  if (type === "adjustment") {
+    const targetSource = body.newBalance ?? body.balance ?? body.finalBalance;
+    const targetBalance = Number(targetSource);
+    if (targetSource === undefined || targetSource === "" || !Number.isFinite(targetBalance)) {
+      const error = new Error("Informe o saldo final do ajuste");
+      error.statusCode = 400;
+      throw error;
+    }
+    nextBalance = targetBalance;
+    delta = nextBalance - previousBalance;
+    movementQuantity = Math.abs(delta);
+  }
+  nextBalance = round(nextBalance);
+  delta = round(delta);
+  movementQuantity = round(movementQuantity);
+  if (nextBalance < 0 && !isAdmin(requestUser)) {
+    const error = new Error("Estoque insuficiente. Somente Admin/Gestor pode autorizar saldo negativo.");
+    error.statusCode = 403;
+    error.available = previousBalance;
+    throw error;
+  }
+  const previousData = { stock: previousBalance, cost: material.cost };
+  material.stock = nextBalance;
+  const movement = withCompany({
+    id: uid("stk"),
+    type,
+    label: stockMovementTypeLabel(type),
+    direction: delta >= 0 ? "in" : "out",
+    materialId: material.id,
+    materialName: material.name,
+    productId: body.productId || material.productId || "",
+    productName: body.productName || material.productName || material.name,
+    orderId: body.orderId || "",
+    quoteId: body.quoteId || "",
+    quantity: movementQuantity,
+    delta,
+    previousBalance,
+    balanceAfter: nextBalance,
+    unit: material.unit || body.unit || "",
+    unitCost: Number(material.cost || 0),
+    totalCost: round(Math.abs(delta) * Number(material.cost || 0)),
+    reason,
+    responsible: body.responsible || requestUser?.name || db.currentUser.name || "Almoxarifado",
+    user: requestUser?.name || db.currentUser.name || "Sistema",
+    authorizedBy: nextBalance < 0 ? (body.authorizedBy || requestUser?.name || "") : (body.authorizedBy || ""),
+    storeId: currentCompanyId(),
+    storeName: companyLabel(),
+    createdAt: new Date().toISOString()
+  }, "stockMovements");
+  db.stockMovements.push(movement);
+  audit(`Estoque - ${movement.label}`, "stock", material.id, movement.user, `${material.name}: ${delta > 0 ? "+" : ""}${delta} ${movement.unit}. Motivo: ${reason}`, {
+    previousData,
+    newData: { stock: material.stock, movement }
+  });
+  return { material, movement };
+}
+
 function audit(action, entity, entityId, user, details, metadata = {}) {
   db.auditLogs.push(withCompany({
     id: uid("aud"),
@@ -4750,6 +4868,7 @@ function permissionForRoute(method, pathname) {
   if (pathname.startsWith("/api/pricing-simulator")) return "quote";
   if (pathname.startsWith("/api/customers")) return "administration";
   if (pathname.startsWith("/api/materials")) return "supplies";
+  if (pathname.startsWith("/api/stock-movements")) return "supplies";
   if (pathname.startsWith("/api/reports/quoted-approved")) return "quote";
   if (pathname.startsWith("/api/quote") || pathname.startsWith("/api/quotes")) return "quote";
   if (pathname.startsWith("/api/orders") && (pathname.includes("/approval") || pathname.includes("/history") || pathname.includes("/post-calculation") || pathname.includes("/production-label"))) return "orders";
@@ -6628,6 +6747,21 @@ async function handleApi(req, res, pathname) {
   }
   if (req.method === "GET" && pathname === "/api/alerts") return json(res, 200, alerts());
   if (req.method === "GET" && pathname === "/api/materials") return json(res, 200, scoped("materials"));
+  if (req.method === "GET" && pathname === "/api/stock-movements") {
+    const materialId = requestUrl.searchParams.get("materialId") || "";
+    const movements = scoped("stockMovements")
+      .filter(movement => !materialId || movement.materialId === materialId)
+      .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    return json(res, 200, movements);
+  }
+  if (req.method === "POST" && pathname === "/api/stock-movements") {
+    try {
+      const result = applyStockMovement(await readBody(req), requestUser);
+      return json(res, 201, result);
+    } catch (error) {
+      return json(res, error.statusCode || 500, { error: error.message || "Nao foi possivel registrar estoque", available: error.available });
+    }
+  }
   const stockMatch = pathname.match(/^\/api\/orders\/([^/]+)\/stock-consume$/);
   if (req.method === "POST" && stockMatch) {
     const body = await readBody(req);
@@ -7019,6 +7153,7 @@ async function handleApi(req, res, pathname) {
     const visit = scopedFind("technicalVisits", item => item.id === completeTechnicalVisitMatch[1]);
     if (!visit) return json(res, 404, { error: "Visita tecnica nao encontrada" });
     const previousData = { ...visit };
+    if (!String(body.measurementNotes || visit.measurementNotes || "").trim()) return json(res, 400, { error: "Informe medidas/observacoes antes de concluir a visita" });
     Object.assign(visit, normalizeTechnicalVisit({ ...body, status: "completed", completedAt: new Date().toISOString() }, visit));
     audit("Visita tecnica concluida", "technical_visit", visit.id, db.currentUser.name, visit.measurementNotes || "Visita concluida", { previousData, newData: visit });
     return json(res, 200, visit);

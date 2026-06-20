@@ -39,6 +39,23 @@ async function openView(page, viewId, selector) {
   await page.waitForSelector(selector, { timeout: 15000 });
 }
 
+async function validateDashboardShortcuts(page, evidence) {
+  await openView(page, "dashboard", ".home-work-center");
+  const targets = await page.$$eval("#quick-panel [data-view]", buttons => buttons.map(button => ({
+    view: button.dataset.view,
+    label: button.textContent.trim().replace(/\s+/g, " ")
+  })));
+  if (targets.length < 9) throw new Error(`Dashboard com atalhos insuficientes: ${targets.length}`);
+  for (const target of targets) {
+    const exists = await page.evaluate(viewId => Boolean(document.getElementById(viewId)), target.view);
+    if (!exists) throw new Error(`Atalho sem tela real: ${target.label} -> ${target.view}`);
+    await page.click(`#quick-panel [data-view="${target.view}"]`);
+    await page.waitForSelector(`#${target.view}.active`, { timeout: 10000 });
+    evidence.shortcutChecks.push({ ...target, status: "ok" });
+    await openView(page, "dashboard", ".home-work-center");
+  }
+}
+
 (async () => {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ viewport: { width: 1440, height: 930 } });
@@ -57,6 +74,7 @@ async function openView(page, viewId, selector) {
     generatedAt: new Date().toISOString(),
     baseUrl,
     views: [],
+    shortcutChecks: [],
     consoleErrors,
     failedRequests
   };
@@ -79,6 +97,7 @@ async function openView(page, viewId, selector) {
     await page.screenshot({ path: screenshot, fullPage: true });
     evidence.views.push({ viewId, screenshot, selector, metrics });
   }
+  await validateDashboardShortcuts(page, evidence);
 
   await browser.close();
   fs.writeFileSync("work/validate-premium-ui.json", JSON.stringify(evidence, null, 2));
