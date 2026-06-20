@@ -1,0 +1,92 @@
+{
+  "generatedAt": "2026-06-20T13:39:54.703Z",
+  "baseUrl": "http://localhost:3000",
+  "views": [
+    {
+      "viewId": "dashboard",
+      "screenshot": "work/premium-dashboard.png",
+      "selector": "#dashboard-cards",
+      "metrics": {
+        "bodyPremium": true,
+        "sidebarBackground": "rgba(0, 0, 0, 0)",
+        "headerHeight": "74px",
+        "activeMenuBackground": "linear-gradient(135deg, rgb(118, 24, 154), rgb(148, 49, 182))",
+        "cardRadius": "24px"
+      }
+    },
+    {
+      "viewId": "production-pcp",
+      "screenshot": "work/premium-production.png",
+      "selector": "#pcp-dashboard-cards, .production-list-panel, #production-detail-table",
+      "metrics": {
+        "bodyPremium": true,
+        "sidebarBackground": "rgba(0, 0, 0, 0)",
+        "headerHeight": "74px",
+        "activeMenuBackground": "linear-gradient(135deg, rgb(118, 24, 154), rgb(148, 49, 182))",
+        "cardRadius": "24px"
+      }
+    },
+    {
+      "viewId": "quote",
+      "screenshot": "work/premium-quote.png",
+      "selector": "#quote-root-shell, #quote-form",
+      "metrics": {
+        "bodyPremium": true,
+        "sidebarBackground": "rgba(0, 0, 0, 0)",
+        "headerHeight": "74px",
+        "activeMenuBackground": "linear-gradient(135deg, rgb(118, 24, 154), rgb(148, 49, 182))",
+        "cardRadius": "24px"
+      }
+    },
+    {
+      "viewId": "orders-search",
+      "screenshot": "work/premium-orders.png",
+      "selector": ".orders-list-panel, #orders-search-content",
+      "metrics": {
+        "bodyPremium": true,
+        "sidebarBackground": "rgba(0, 0, 0, 0)",
+        "headerHeight": "74px",
+        "activeMenuBackground": "linear-gradient(135deg, rgb(118, 24, 154), rgb(148, 49, 182))",
+        "cardRadius": "24px"
+      }
+    },
+    {
+      "viewId": "finance-receivables",
+      "screenshot": "work/premium-finance.png",
+      "selector": "#finance-receivables-content, #receivables-table",
+      "metrics": {
+        "bodyPremium": true,
+        "sidebarBackground": "rgba(0, 0, 0, 0)",
+        "headerHeight": "74px",
+        "activeMenuBackground": "linear-gradient(135deg, rgb(118, 24, 154), rgb(148, 49, 182))",
+        "cardRadius": "24px"
+      }
+    },
+    {
+      "viewId": "cash-receive",
+      "screenshot": "work/premium-cash.png",
+      "selector": "#cash-receive-content, #payment-order-info",
+      "metrics": {
+        "bodyPremium": true,
+        "sidebarBackground": "rgba(0, 0, 0, 0)",
+        "headerHeight": "74px",
+        "activeMenuBackground": "linear-gradient(135deg, rgb(118, 24, 154), rgb(148, 49, 182))",
+        "cardRadius": "24px"
+      }
+    },
+    {
+      "viewId": "stock-products",
+      "screenshot": "work/premium-products.png",
+      "selector": ".product-catalog-shell, #product-list",
+      "metrics": {
+        "bodyPremium": true,
+        "sidebarBackground": "rgba(0, 0, 0, 0)",
+        "headerHeight": "74px",
+        "activeMenuBackground": "linear-gradient(135deg, rgb(118, 24, 154), rgb(148, 49, 182))",
+        "cardRadius": "24px"
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "failedRequests": []
+}
